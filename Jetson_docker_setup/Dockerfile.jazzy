@@ -1,0 +1,30 @@
+FROM ros:jazzy-ros-base
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Navigation + mapping
+    ros-jazzy-navigation2 \
+    ros-jazzy-nav2-bringup \
+    ros-jazzy-slam-toolbox \
+    ros-jazzy-tf2-tools \
+    ros-jazzy-robot-state-publisher \
+    ros-jazzy-xacro \
+    # micro-ROS message types (agent will run in separate container)
+    ros-jazzy-micro-ros-msgs \
+    # Python YAML without pip (avoids PEP 668 error)
+    python3-yaml \
+    # Useful tools
+    python3-pip \
+    iproute2 \
+    net-tools \
+    sudo \
+    less \
+    nano \
+ && rm -rf /var/lib/apt/lists/*
+
+# interactive shell defaults
+SHELL ["/bin/bash", "-lc"]
+RUN echo "source /opt/ros/jazzy/setup.bash" >> /etc/bash.bashrc
+
+CMD ["bash"]
