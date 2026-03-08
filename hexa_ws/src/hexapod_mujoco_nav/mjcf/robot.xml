@@ -1,0 +1,1379 @@
+<?xml version="1.0" ?>
+<!-- Generated using onshape-to-robot -->
+<!-- Onshape https://cad.onshape.com/documents/d5d4009027589ed68ee49fc5/w/a944eda5006cb7d5f4497a5e/e/88844dae1ecb8d5f58e6505d -->
+<mujoco model="C:\Users\72847\OneDrive\Desktop\CMU\semester 1\Mechatronics\MUJOCO\my-robot6leg">
+  <compiler angle="radian" meshdir="assets" autolimits="true"/>
+  <default>
+    <default class="C:\Users\72847\OneDrive\Desktop\CMU\semester 1\Mechatronics\MUJOCO\my-robot6leg">
+      <joint frictionloss="0.1" armature="0.005"/>
+      <position kp="50" dampratio="1"/>
+      <default class="visual">
+        <geom type="mesh" contype="0" conaffinity="0" group="2"/>
+      </default>
+      <default class="collision">
+        <geom group="3"/>
+      </default>
+    </default>
+  </default>
+  <worldbody>
+    <!-- Link base_link -->
+    <body name="base_link"
+          pos="0 0 0"
+          quat="1 0 0 0"
+          childclass="C:\Users\72847\OneDrive\Desktop\CMU\semester 1\Mechatronics\MUJOCO\my-robot6leg">
+      <freejoint name="base_link_freejoint"/>
+      <inertial pos="0.166415 0.197242 0.378765"
+                mass="16.0805"
+                fullinertia="0.419032 0.668264 1.0605 -7.65285e-05 -0.000125438 1.37408e-05"/>
+      <!-- Add inside <body name="base_link" ...> -->
+      <body name="sensor_head" pos="0.20 0 0.55" quat="1 0 0 0">
+        <site name="imu_site"
+              pos="0 0 0"
+              size="0.01"
+              rgba="1 0 0 1"/>
+
+        <!-- Camera frame:
+            X = right, Y = up, -Z = forward in MuJoCo.
+            This orientation points the camera forward along robot +X. -->
+        <camera name="rgbd_cam"
+                pos="0.06 0 0.02"
+                xyaxes="0 -1 0 0 0 1"
+                fovy="69"
+                resolution="640 480"/>
+
+        <!-- Optional origin site for debug / rangefinder -->
+        <site name="rgbd_origin"
+              pos="0.06 0 0.02"
+              xyaxes="0 -1 0 0 0 1"
+              size="0.005"
+              rgba="0 1 0 1"/>
+      </body>
+
+      <!-- Part base_link -->
+      <geom type="mesh"
+            class="visual"
+            pos="-0.0456011 0.0933496 0.383801"
+            quat="1 -0 -0 -0"
+            mesh="base_link"
+            material="base_link_material"/>
+      <geom type="mesh"
+            class="collision"
+            pos="-0.0456011 0.0933496 0.383801"
+            quat="1 -0 -0 -0"
+            mesh="base_link"
+            material="base_link_material"/>
+      <!-- Link rightmidbase -->
+      <body name="rightmidbase"
+            pos="0.166241 0.472261 0.393723"
+            quat="0.707107 0.707107 0 0">
+        <!-- Joint from base_link to rightmidbase -->
+        <!-- Joint is "fixed", skipping it -->
+        <inertial pos="0.00180107 -0.0858959 -0.0433133"
+                  mass="12.4943"
+                  fullinertia="0.120203 0.531803 0.526072 0.000294318 0.00367782 -0.00446107"/>
+        <!-- Part rightmidbase -->
+        <geom type="mesh"
+              class="visual"
+              pos="0.540638 -0.305497 -0.01"
+              quat="0.5 -0.5 -0.5 -0.5"
+              mesh="rightmidbase"
+              material="rightmidbase_material"/>
+        <geom type="mesh"
+              class="collision"
+              pos="0.540638 -0.305497 -0.01"
+              quat="0.5 -0.5 -0.5 -0.5"
+              mesh="rightmidbase"
+              material="rightmidbase_material"/>
+        <!-- Link top_link -->
+        <body name="top_link"
+              pos="-0.314235 0.005 -0.025"
+              quat="1 -0 0 -0">
+          <!-- Joint from rightmidbase to top_link -->
+          <joint axis="0 0 1"
+                 name="fr_top"
+                 type="hinge"/>
+          <inertial pos="-0.078102 0.0253888 -0.0125"
+                    mass="0.676586"
+                    fullinertia="0.000379566 0.00213365 0.00244274 0.00063758 -0 -0"/>
+          <!-- Part top_link -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.0578444 0.0345763 -0.01"
+                quat="0.987678 -0 -0 -0.156503"
+                mesh="top_link"
+                material="top_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.0578444 0.0345763 -0.01"
+                quat="0.987678 -0 -0 -0.156503"
+                mesh="top_link"
+                material="top_link_material"/>
+          <!-- Link round_joint -->
+          <body name="round_joint"
+                pos="-0.156204 0.0507776 -0.025"
+                quat="0.987678 -0 -0 -0.156503">
+            <!-- Joint from top_link to round_joint -->
+            <joint axis="0 0 1"
+                   name="fr_top2round"
+                   type="hinge"/>
+            <inertial pos="0 0 -0.0125"
+                      mass="0.125827"
+                      fullinertia="2.73464e-05 2.73464e-05 4.15858e-05 -0 -0 0"/>
+            <!-- Part round_joint -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="0 0 -0.025"
+                  quat="0.53507 -0.462277 -0.53507 -0.462277"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="0 0 -0.025"
+                  quat="0.53507 -0.462277 -0.53507 -0.462277"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <!-- Link left_triangle_link -->
+            <body name="left_triangle_link"
+                  pos="0 0 -0.025"
+                  quat="0.997347 0 0 0.0727933">
+              <joint axis="0 0 1"
+                     name="fr_round2leg"
+                     type="hinge"/>
+              <inertial pos="-0.0105576 -0.266709 -0.0125"
+                        mass="1.0469"
+                        fullinertia="0.0291596 0.00100878 0.029996 0.0027906 0 0"/>
+
+              <geom type="mesh"
+                    class="visual"
+                    pos="-0.00536417 -0.0761987 -0.01"
+                    quat="0.992949 -0 -0 0.118539"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+
+              <geom type="mesh"
+                    class="collision"
+                    pos="-0.00536417 -0.0761987 -0.01"
+                    quat="0.992949 -0 -0 0.118539"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+
+              <site group="3"
+                    name="closing_fr_mid2leg_2"
+                    pos="-0.0495724 -0.180569 0"
+                    quat="0 0.992949 0.118539 0"/>
+              <site group="3"
+                    name="closing_fr_mid2leg_2_z"
+                    pos="-0.0495724 -0.180569 -0.1"
+                    quat="0 0.992949 0.118539 0"/>
+            </body>
+          </body>
+        </body>
+        <!-- Link top_link_2 -->
+        <body name="top_link_2"
+              pos="0.314235 0.005 -0.025"
+              quat="0.125484 -0 -0 -0.992096">
+          <!-- Joint from rightmidbase to top_link_2 -->
+          <joint axis="0 0 1"
+                 name="br_top"
+                 type="hinge"/>
+          <inertial pos="-0.082125 0 -0.0125"
+                    mass="0.676586"
+                    fullinertia="0.000172306 0.00234091 0.00244274 -0 -0 -0"/>
+          <!-- Part top_link_2 -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.0657 0.015 -0.01"
+                quat="1 0 -0 -0"
+                mesh="top_link"
+                material="top_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.0657 0.015 -0.01"
+                quat="1 0 -0 -0"
+                mesh="top_link"
+                material="top_link_material"/>
+          <!-- Link round_joint_2 -->
+          <body name="round_joint_2"
+                pos="-0.16425 -0 -0.025"
+                quat="0.999655 -0 0 -0.0262653">
+            <!-- Joint from top_link_2 to round_joint_2 -->
+            <joint axis="0 0 1"
+                   name="br_top2round"
+                   type="hinge"/>
+            <inertial pos="0 -0 -0.0125"
+                      mass="0.125827"
+                      fullinertia="2.73464e-05 2.73464e-05 4.15858e-05 -0 -0 0"/>
+            <!-- Part round_joint_2 -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="0 0 0"
+                  quat="0.5 0.5 0.5 -0.5"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="0 0 0"
+                  quat="0.5 0.5 0.5 -0.5"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <!-- Link left_triangle_link_2 -->
+            <body name="left_triangle_link_2"
+                  pos="0 0 -0.025"
+                  quat="1 -0 0 0">
+              <!-- Joint from round_joint_2 to left_triangle_link_2 -->
+              <joint axis="0 0 1"
+                     name="br_round2leg"
+                     type="hinge"/>
+              <inertial pos="-0.0345644 0.264671 -0.0125"
+                        mass="1.0469"
+                        fullinertia="0.0294319 0.000736461 0.029996 -0.000217136 0 -0"/>
+              <!-- Part left_triangle_link_2 -->
+              <geom type="mesh"
+                    class="visual"
+                    pos="-0.0122133 0.0754045 -0.015"
+                    quat="0 -0.997288 0.0736041 -0"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+              <geom type="mesh"
+                    class="collision"
+                    pos="-0.0122133 0.0754045 -0.015"
+                    quat="0 -0.997288 0.0736041 -0"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+
+              <!-- Frame closing_br_mid2leg_2 -->
+              <site group="3"
+                    name="closing_br_mid2leg_2"
+                    pos="-0.0656528 0.175363 -0"
+                    quat="0 -0.997288 0.0736041 -0"/>
+              <!-- Frame closing_br_mid2leg_2_z -->
+              <site group="3"
+                    name="closing_br_mid2leg_2_z"
+                    pos="-0.0656528 0.175363 -0.1"
+                    quat="0 -0.997288 0.0736041 -0"/>
+            </body>
+          </body>
+        </body>
+        <!-- Link top_link_3 -->
+        <body name="top_link_3"
+              pos="-0.064219 0.005 -0.21175"
+              quat="1 0 0 -0">
+          <!-- Joint from rightmidbase to top_link_3 -->
+          <joint axis="0 0 1"
+                 name="rm_top"
+                 type="hinge"/>
+          <inertial pos="-0.0789105 0.0227519 -0.0125"
+                    mass="0.676586"
+                    fullinertia="0.000338749 0.00217447 0.00244274 0.000577275 0 0"/>
+          <!-- Part top_link_3 -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.0589728 0.0326144 -0.01"
+                quat="0.990166 0 0 -0.139896"
+                mesh="top_link"
+                material="top_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.0589728 0.0326144 -0.01"
+                quat="0.990166 0 0 -0.139896"
+                mesh="top_link"
+                material="top_link_material"/>
+          <!-- Link round_joint_3 -->
+          <body name="round_joint_3"
+                pos="-0.157821 0.0455038 -0.025"
+                quat="0.990166 0 0 -0.139896">
+            <!-- Joint from top_link_3 to round_joint_3 -->
+            <joint axis="0 0 1"
+                   name="rm_top2round"
+                   type="hinge"/>
+            <inertial pos="0 0 -0.0125"
+                      mass="0.125827"
+                      fullinertia="2.73464e-05 2.73464e-05 4.15858e-05 0 -0 0"/>
+            <!-- Part round_joint_3 -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="0 0 -0.025"
+                  quat="0.586812 -0.394527 -0.586812 -0.394527"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="0 0 -0.025"
+                  quat="0.586812 -0.394527 -0.586812 -0.394527"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <!-- Link left_triangle_link_3 -->
+            <body name="left_triangle_link_3"
+                  pos="0 0 -0.025"
+                  quat="0.981339 0 0 0.192286">
+              <!-- Joint from round_joint_3 to left_triangle_link_3 -->
+              <joint axis="0 0 1"
+                     name="rm_round2leg"
+                     type="hinge"/>
+              <inertial pos="-0.100691 -0.247198 -0.0125"
+                        mass="1.0469"
+                        fullinertia="0.0276854 0.00248296 0.029996 -0.00686393 0 -0"/>
+              <!-- Part left_triangle_link_3 -->
+              <geom type="mesh" class="visual"
+                    pos="-0.0309751 -0.0698252 -0.01"
+                    quat="0.998499 -0 -0 -0.0547769"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+              <geom type="mesh"
+                    class="collision"
+                    pos="-0.0309751 -0.0698252 -0.01"
+                    quat="0.998499 -0 -0 -0.0547769"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+
+              <!-- Frame closing_rm_mid2leg_2 -->
+              <site group="3"
+                    name="closing_rm_mid2leg_2"
+                    pos="-0.108063 -0.152922 0"
+                    quat="0 0.998499 -0.0547769 0"/>
+              <!-- Frame closing_rm_mid2leg_2_z -->
+              <site group="3"
+                    name="closing_rm_mid2leg_2_z"
+                    pos="-0.108063 -0.152922 -0.1"
+                    quat="0 0.998499 -0.0547769 0"/>
+            </body>
+          </body>
+        </body>
+        <!-- Link right_down_link -->
+        <body name="right_down_link"
+              pos="-0.125 -0.14824 -0.025"
+              quat="1 -0 0 -0">
+          <!-- Joint from rightmidbase to right_down_link -->
+          <joint axis="0 0 1"
+                 name="fr_rightdown"
+                 type="hinge"/>
+          <inertial pos="-0.0026547 0.0248532 -0.0125"
+                    mass="0.288986"
+                    fullinertia="0.000213781 7.29937e-05 0.000256672 1.52118e-05 -0 -0"/>
+          <!-- Part right_down_link -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.0181174 0.0283863 -0.025"
+                quat="0.525883 -0.472702 -0.525883 -0.472702"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.0181174 0.0283863 -0.025"
+                quat="0.525883 -0.472702 -0.525883 -0.472702"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <!-- Link middle_triangle_link -->
+          <body name="middle_triangle_link"
+                pos="-0.00585754 0.054838 -0.025"
+                quat="0.998585 -0 0 0.0531808">
+            <!-- Joint from right_down_link to middle_triangle_link -->
+            <joint axis="0 0 1"
+                   name="fr_rightdown2mid"
+                   type="hinge"/>
+            <inertial pos="-0.208881 0.00200939 -0.0125629"
+                      mass="1.53075"
+                      fullinertia="0.000559537 0.0266114 0.0270118 0.00153057 -1.12514e-05 7.35553e-07"/>
+            <!-- Part middle_triangle_link -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="-0.201072 0.00522797 -0.025"
+                  quat="0.485429 -0.514158 -0.485429 -0.514158"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="-0.201072 0.00522797 -0.025"
+                  quat="0.485429 -0.514158 -0.485429 -0.514158"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <!-- Frame closing_fr_leftdown2mid_1 -->
+            <site group="3"
+                  name="closing_fr_leftdown2mid_1"
+                  pos="-0.205007 -0.00998138 -0"
+                  quat="0.999587 0 -0 -0.0287288"/>
+            <!-- Frame closing_fr_leftdown2mid_1_z -->
+            <site group="3"
+                  name="closing_fr_leftdown2mid_1_z"
+                  pos="-0.205007 -0.00998138 0.1"
+                  quat="0.999587 0 -0 -0.0287288"/>
+            <!-- Frame closing_fr_mid2leg_1 -->
+            <site group="3"
+                  name="closing_fr_mid2leg_1"
+                  pos="-0.418558 0.0240792 -0.025"
+                  quat="0 -0.999587 0.0287288 -0"/>
+            <!-- Frame closing_fr_mid2leg_1_z -->
+            <site group="3"
+                  name="closing_fr_mid2leg_1_z"
+                  pos="-0.418558 0.0240792 -0.125"
+                  quat="0 -0.999587 0.0287288 -0"/>
+          </body>
+        </body>
+        <!-- Link right_down_link_2 -->
+        <body name="right_down_link_2"
+              pos="0.125016 -0.14824 -0.21175"
+              quat="1 0 0 -0">
+          <!-- Joint from rightmidbase to right_down_link_2 -->
+          <joint axis="0 0 1"
+                 name="rm_rightdown"
+                 type="hinge"/>
+          <inertial pos="-0.00877439 0.0234038 -0.0125"
+                    mass="0.288986"
+                    fullinertia="0.000197655 8.91195e-05 0.000256672 4.73461e-05 -0 -0"/>
+          <!-- Part right_down_link_2 -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.0246295 0.0229654 -0.025"
+                quat="0.581174 -0.402787 -0.581174 -0.402787"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.0246295 0.0229654 -0.025"
+                quat="0.581174 -0.402787 -0.581174 -0.402787"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <!-- Link middle_triangle_link_2 -->
+          <body name="middle_triangle_link_2"
+                pos="-0.0193605 0.05164 -0.025"
+                quat="0.98396 -0 0 0.178387">
+            <!-- Joint from right_down_link_2 to middle_triangle_link_2 -->
+            <joint axis="0 0 1"
+                   name="rm_rightdown2mid"
+                   type="hinge"/>
+            <inertial pos="-0.201229 0.0560552 -0.0125629"
+                      mass="1.53075"
+                      fullinertia="0.00307402 0.0240969 0.0270118 0.00784391 -1.06768e-05 3.62534e-06"/>
+            <!-- Part middle_triangle_link_2 -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="-0.192853 0.057141 -0.025"
+                  quat="0.414091 -0.573174 -0.414091 -0.573174"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="-0.192853 0.057141 -0.025"
+                  quat="0.414091 -0.573174 -0.414091 -0.573174"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <!-- Frame closing_rm_leftdown2mid_1 -->
+            <site group="3"
+                  name="closing_rm_leftdown2mid_1"
+                  pos="-0.200594 0.0434704 -0"
+                  quat="0.987265 0 -0 -0.159083"/>
+            <!-- Frame closing_rm_leftdown2mid_1_z -->
+            <site group="3"
+                  name="closing_rm_leftdown2mid_1_z"
+                  pos="-0.200594 0.0434704 0.1"
+                  quat="0.987265 0 -0 -0.159083"/>
+            <!-- Frame closing_rm_mid2leg_1 -->
+            <site group="3"
+                  name="closing_rm_mid2leg_1"
+                  pos="-0.39803 0.131692 -0.025"
+                  quat="0 -0.987265 0.159083 -0"/>
+            <!-- Frame closing_rm_mid2leg_1_z -->
+            <site group="3"
+                  name="closing_rm_mid2leg_1_z"
+                  pos="-0.39803 0.131692 -0.125"
+                  quat="0 -0.987265 0.159083 -0"/>
+          </body>
+        </body>
+        <!-- Link right_down_link_3 -->
+        <body name="right_down_link_3"
+              pos="0.125 -0.14824 -0.025"
+              quat="1 -0 0 -0">
+          <!-- Joint from rightmidbase to right_down_link_3 -->
+          <joint axis="0 0 1"
+                 name="br_rightdown"
+                 type="hinge"/>
+          <inertial pos="0.0128157 0.021459 -0.0125"
+                    mass="0.288986"
+                    fullinertia="0.000177538 0.000109236 0.000256672 -6.34062e-05 0 -0"/>
+          <!-- Part right_down_link_3 -->
+          <geom type="mesh"
+                class="visual"
+                pos="0.0283372 0.0181941 -0"
+                quat="0.614967 -0.349021 0.614967 0.349021"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="0.0283372 0.0181941 -0"
+                quat="0.614967 -0.349021 0.614967 0.349021"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <!-- Link middle_triangle_link_3 -->
+          <body name="middle_triangle_link_3"
+                pos="0.0282775 0.0473488 -0.025"
+                quat="0.265946 -0 -0 0.963988">
+            <!-- Joint from right_down_link_3 to middle_triangle_link_3 -->
+            <joint axis="0 0 1"
+                   name="br_rightdown2mid"
+                   type="hinge"/>
+            <inertial pos="-0.187028 -0.0930347 -0.0124371"
+                      mass="1.53075"
+                      fullinertia="0.00673146 0.0204395 0.0270118 -0.0111821 9.8004e-06 5.57568e-06"/>
+            <!-- Part middle_triangle_link_3 -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="-0.178599 -0.0925198 0"
+                  quat="0.609854 0.35788 0.609854 -0.35788"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="-0.178599 -0.0925198 0"
+                  quat="0.609854 0.35788 0.609854 -0.35788"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <!-- Frame closing_br_leftdown2mid_2 -->
+            <site group="3"
+                  name="closing_br_leftdown2mid_2"
+                  pos="-0.188781 -0.0805563 0"
+                  quat="0 -0.862464 0.506118 -0"/>
+            <!-- Frame closing_br_leftdown2mid_2_z -->
+            <site group="3"
+                  name="closing_br_leftdown2mid_2_z"
+                  pos="-0.188781 -0.0805563 -0.1"
+                  quat="0 -0.862464 0.506118 -0"/>
+            <!-- Frame closing_br_mid2leg_1 -->
+            <site group="3"
+                  name="closing_br_mid2leg_1"
+                  pos="-0.366013 -0.204463 -0.025"
+                  quat="0 0.967734 0.251975 0"/>
+            <!-- Frame closing_br_mid2leg_1_z -->
+            <site group="3"
+                  name="closing_br_mid2leg_1_z"
+                  pos="-0.366013 -0.204463 -0.125"
+                  quat="0 0.967734 0.251975 0"/>
+          </body>
+        </body>
+        <!-- Link left_down_link -->
+        <body name="left_down_link"
+              pos="-0.333652 -0.2041 -0.025"
+              quat="1 -0 0 -0">
+          <!-- Joint from rightmidbase to left_down_link -->
+          <joint axis="0 0 1"
+                 name="fr_leftdown"
+                 type="hinge"/>
+          <inertial pos="3.39898e-06 0.0395 -0.0125"
+                    mass="0.386736"
+                    fullinertia="0.0004768 9.68246e-05 0.000533339 -3.2697e-08 -0 0"/>
+          <!-- Part left_down_link -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.0149959 0.0474013 -0.025"
+                quat="0.707107 -3.04233e-05 -0.707107 -3.04233e-05"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.0149959 0.0474013 -0.025"
+                quat="0.707107 -3.04233e-05 -0.707107 -3.04233e-05"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <!-- Frame closing_fr_leftdown2mid_2 -->
+          <site group="3"
+                name="closing_fr_leftdown2mid_2"
+                pos="6.79795e-06 0.079 -0.025"
+                quat="0.707076 0 0 -0.707137"/>
+          <!-- Frame closing_fr_leftdown2mid_2_z -->
+          <site group="3"
+                name="closing_fr_leftdown2mid_2_z"
+                pos="6.79795e-06 0.079 0.075"
+                quat="0.707076 0 0 -0.707137"/>
+        </body>
+        <!-- Link left_down_link_2 -->
+        <body name="left_down_link_2"
+              pos="-0.0836358 -0.2041 -0.21175"
+              quat="1 0 0 -0">
+          <!-- Joint from rightmidbase to left_down_link_2 -->
+          <joint axis="0 0 1"
+                 name="rm_leftdown"
+                 type="hinge"/>
+          <inertial pos="-0.00689817 0.038893 -0.0125"
+                    mass="0.386736"
+                    fullinertia="0.000465211 0.000108413 0.000533339 6.53381e-05 -0 0"/>
+          <!-- Part left_down_link_2 -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.0230473 0.044052 -0.025"
+                quat="0.704385 0.0619822 -0.704385 0.0619822"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.0230473 0.044052 -0.025"
+                quat="0.704385 0.0619822 -0.704385 0.0619822"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <!-- Frame closing_rm_leftdown2mid_2 -->
+          <site group="3"
+                name="closing_rm_leftdown2mid_2"
+                pos="-0.0137963 0.077786 -0.025"
+                quat="0.766367 0 0 -0.642403"/>
+          <!-- Frame closing_rm_leftdown2mid_2_z -->
+          <site group="3"
+                name="closing_rm_leftdown2mid_2_z"
+                pos="-0.0137963 0.077786 0.075"
+                quat="0.766367 0 0 -0.642403"/>
+        </body>
+        <!-- Link left_down_link_3 -->
+        <body name="left_down_link_3"
+              pos="0.333652 -0.2041 -0.025"
+              quat="1 -0 0 -0">
+          <!-- Joint from rightmidbase to left_down_link_3 -->
+          <joint axis="0 0 1"
+                 name="br_leftdown"
+                 type="hinge"/>
+          <inertial pos="0.0115035 0.0377878 -0.0125"
+                    mass="0.386736"
+                    fullinertia="0.000444573 0.000129052 0.000533339 -0.000105863 -0 0"/>
+          <!-- Part left_down_link_3 -->
+          <geom type="mesh"
+                class="visual"
+                pos="0.028154 0.040977 -0"
+                quat="0.699402 0.104099 0.699402 -0.104099"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="0.028154 0.040977 -0"
+                quat="0.699402 0.104099 0.699402 -0.104099"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <!-- Frame closing_br_leftdown2mid_1 -->
+          <site group="3"
+                name="closing_br_leftdown2mid_1"
+                pos="0.023007 0.0755757 -0.025"
+                quat="0 -0.803501 -0.595303 0"/>
+          <!-- Frame closing_br_leftdown2mid_1_z -->
+          <site group="3"
+                name="closing_br_leftdown2mid_1_z"
+                pos="0.023007 0.0755757 -0.125"
+                quat="0 -0.803501 -0.595303 0"/>
+        </body>
+      </body>
+      <!-- Link fusioncomponent -->
+      <body name="fusioncomponent"
+            pos="0.166241 -0.0777387 0.393723"
+            quat="0.707107 -0.707107 -0 0">
+        <!-- Joint from base_link to fusioncomponent -->
+        <!-- Joint is "fixed", skipping it -->
+        <inertial pos="0.00180107 0.0858959 -0.0433133"
+                  mass="12.4943"
+                  fullinertia="0.120203 0.531803 0.526072 -0.000294318 0.00367782 0.00446107"/>
+        <!-- Part fusioncomponent -->
+        <geom type="mesh"
+              class="visual"
+              pos="0.540638 0.305497 1.24624"
+              quat="0.5 0.5 0.5 -0.5"
+              mesh="fusioncomponent"
+              material="fusioncomponent_material"/>
+        <geom type="mesh"
+              class="collision"
+              pos="0.540638 0.305497 1.24624"
+              quat="0.5 0.5 0.5 -0.5"
+              mesh="fusioncomponent"
+              material="fusioncomponent_material"/>
+        <!-- Link top_link_4 -->
+        <body name="top_link_4"
+              pos="-0.064219 -0.005 -0.21175"
+              quat="1 -0 -0 0">
+          <!-- Joint from fusioncomponent to top_link_4 -->
+          <joint axis="0 0 1"
+                 name="lm_top"
+                 type="hinge"/>
+          <inertial pos="-0.078472 -0.0242209 -0.0125"
+                    mass="0.676586"
+                    fullinertia="0.000360937 0.00215228 0.00244274 -0.000611134 -0 0"/>
+          <!-- Part top_link_4 -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.0672016 -0.00504397 -0.01"
+                quat="0.988817 0 -0 0.149132"
+                mesh="top_link"
+                material="top_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.0672016 -0.00504397 -0.01"
+                quat="0.988817 0 -0 0.149132"
+                mesh="top_link"
+                material="top_link_material"/>
+          <!-- Link round_joint_4 -->
+          <body name="round_joint_4"
+                pos="-0.156944 -0.0484419 -0.025"
+                quat="0.98452 0 0 -0.17527">
+            <!-- Joint from top_link_4 to round_joint_4 -->
+            <joint axis="0 0 1"
+                   name="lm_top2round"
+                   type="hinge"/>
+            <inertial pos="0 -0 -0.0125"
+                      mass="0.125827"
+                      fullinertia="2.73464e-05 2.73464e-05 4.15858e-05 -0 0 0"/>
+            <!-- Part round_joint_4 -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="0 0 -0"
+                  quat="0.5 0.5 0.5 -0.5"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="0 0 -0"
+                  quat="0.5 0.5 0.5 -0.5"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <!-- Link left_triangle_link_4 -->
+            <body name="left_triangle_link_4"
+                  pos="0 0 -0.025"
+                  quat="1 0 -0 -0">
+              <!-- Joint from round_joint_4 to left_triangle_link_4 -->
+              <joint axis="0 0 1"
+                     name="lm_round2leg"
+                     type="hinge"/>
+              <inertial pos="-0.149878 0.220867 -0.0125"
+                        mass="1.0469"
+                        fullinertia="0.023805 0.00636336 0.029996 0.0113952 0 0"/>
+              <!-- Part left_triangle_link_4 -->
+              <geom type="mesh"
+                    class="visual"
+                    pos="-0.0448134 0.0618609 -0.015"
+                    quat="0 0.987306 0.15883 0"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+              <geom type="mesh"
+                    class="collision"
+                    pos="-0.0448134 0.0618609 -0.015"
+                    quat="0 0.987306 0.15883 0"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+
+              <!-- Frame closing_lm_mid2leg_2 -->
+              <site group="3"
+                    name="closing_lm_mid2leg_2"
+                    pos="-0.137491 0.127117 -0"
+                    quat="0 0.987306 0.15883 0"/>
+              <!-- Frame closing_lm_mid2leg_2_z -->
+              <site group="3"
+                    name="closing_lm_mid2leg_2_z"
+                    pos="-0.137491 0.127117 -0.1"
+                    quat="0 0.987306 0.15883 0"/>
+            </body>
+          </body>
+        </body>
+        <!-- Link top_link_5 -->
+        <body name="top_link_5"
+              pos="0.314235 -0.005 -0.025"
+              quat="1 -0 -0 0">
+          <!-- Joint from fusioncomponent to top_link_5 -->
+          <joint axis="0 0 1"
+                 name="bl_top"
+                 type="hinge"/>
+          <inertial pos="0.0798411 -0.0192332 -0.0125"
+                    mass="0.676586"
+                    fullinertia="0.000291248 0.00222197 0.00244274 0.000493752 0 0"/>
+          <!-- Part top_link_5 -->
+          <geom type="mesh"
+                class="visual"
+                pos="0.0603599 -0.0299694 -0.01"
+                quat="0.11792 -0 -0 0.993023"
+                mesh="top_link"
+                material="top_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="0.0603599 -0.0299694 -0.01"
+                quat="0.11792 -0 -0 0.993023"
+                mesh="top_link"
+                material="top_link_material"/>
+          <!-- Link round_joint_5 -->
+          <body name="round_joint_5"
+                pos="0.159682 -0.0384665 -0.025"
+                quat="0.11792 -0 -0 0.993023">
+            <!-- Joint from top_link_5 to round_joint_5 -->
+            <joint axis="0 0 1"
+                   name="bl_top2round"
+                   type="hinge"/>
+            <inertial pos="-0 -0 -0.0125"
+                      mass="0.125827"
+                      fullinertia="2.73464e-05 2.73464e-05 4.15858e-05 0 -0 -0"/>
+            <!-- Part round_joint_5 -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="0 0 -0.025"
+                  quat="0.577153 -0.408527 -0.577153 -0.408527"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="0 0 -0.025"
+                  quat="0.577153 -0.408527 -0.577153 -0.408527"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <!-- Link left_triangle_link_5 -->
+            <body name="left_triangle_link_5"
+                  pos="0 0 -0.025"
+                  quat="0.98568 -0 0 0.168626">
+              <!-- Joint from round_joint_5 to left_triangle_link_5 -->
+              <joint axis="0 0 1"
+                     name="bl_round2leg"
+                     type="hinge"/>
+              <inertial pos="-0.117211 -0.239806 -0.0125"
+                        mass="1.0469"
+                        fullinertia="0.0266416 0.00352681 0.029996 -0.00850478 0 -0"/>
+              <!-- Part left_triangle_link_5 -->
+              <geom type="mesh"
+                    class="visual"
+                    pos="-0.0356355 -0.0675657 -0.01"
+                    quat="0.996068 -0 -0 -0.088596"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+              <geom type="mesh"
+                    class="collision"
+                    pos="-0.0356355 -0.0675657 -0.01"
+                    quat="0.996068 -0 -0 -0.088596"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+
+              <!-- Frame closing_bl_mid2leg_2 -->
+              <site group="3"
+                    name="closing_bl_mid2leg_2"
+                    pos="-0.118177 -0.145247 0"
+                    quat="0 0.996068 -0.088596 0"/>
+              <!-- Frame closing_bl_mid2leg_2_z -->
+              <site group="3"
+                    name="closing_bl_mid2leg_2_z"
+                    pos="-0.118177 -0.145247 -0.1"
+                    quat="0 0.996068 -0.088596 0"/>
+            </body>
+          </body>
+        </body>
+        <!-- Link top_link_6 -->
+        <body name="top_link_6"
+              pos="-0.314235 -0.005 -0.025"
+              quat="1 -0 -0 0">
+          <!-- Joint from fusioncomponent to top_link_6 -->
+          <joint axis="0 0 1"
+                 name="fl_top"
+                 type="hinge"/>
+          <inertial pos="-0.0780862 -0.0254372 -0.0125"
+                    mass="0.676586"
+                    fullinertia="0.000380358 0.00213286 0.00244274 -0.000638668 -0 0"/>
+          <!-- Part top_link_6 -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.0671151 -0.00608747 -0.01"
+                quat="0.987629 0 -0 0.156809"
+                mesh="top_link"
+                material="top_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.0671151 -0.00608747 -0.01"
+                quat="0.987629 0 -0 0.156809"
+                mesh="top_link"
+                material="top_link_material"/>
+          <!-- Link round_joint_6 -->
+          <body name="round_joint_6"
+                pos="-0.156172 -0.0508745 -0.025"
+                quat="0.979153 -0 0 0.203123">
+            <!-- Joint from top_link_6 to round_joint_6 -->
+            <joint axis="0 0 1"
+                   name="fl_top2round"
+                   type="hinge"/>
+            <inertial pos="-0 -0 -0.0125"
+                      mass="0.125827"
+                      fullinertia="2.73464e-05 2.73464e-05 4.15858e-05 0 -0 0"/>
+            <!-- Part round_joint_6 -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="0 -0 -0"
+                  quat="0.5 0.5 0.5 -0.5"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="0 -0 -0"
+                  quat="0.5 0.5 0.5 -0.5"
+                  mesh="round_joint"
+                  material="round_joint_material"/>
+            <!-- Link left_triangle_link_6 -->
+            <body name="left_triangle_link_6"
+                  pos="-0 -0 -0.025"
+                  quat="1 0 -0 0">
+              <!-- Joint from round_joint_6 to left_triangle_link_6 -->
+              <joint axis="0 0 1"
+                     name="fl_round2leg"
+                     type="hinge"/>
+              <inertial pos="0.0537161 0.261457 -0.0125"
+                        mass="1.0469"
+                        fullinertia="0.0262409 0.00392749 0.029996 -0.009024 0 -0"/>
+              <!-- Part left_triangle_link_6 -->
+              <geom type="mesh"
+                    class="visual"
+                    pos="0.0130673 0.0752613 -0.015"
+                    quat="0 -0.971358 0.23762 -0"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+              <geom type="mesh"
+                    class="collision"
+                    pos="0.0130673 0.0752613 -0.015"
+                    quat="0 -0.971358 0.23762 -0"
+                    mesh="left_triangle_link"
+                    material="left_triangle_link_material"/>
+
+              <!-- Frame closing_fl_mid2leg_2 -->
+              <site group="3"
+                    name="closing_fl_mid2leg_2"
+                    pos="-0.00481935 0.187188 0"
+                    quat="0 -0.971358 0.23762 -0"/>
+              <!-- Frame closing_fl_mid2leg_2_z -->
+              <site group="3"
+                    name="closing_fl_mid2leg_2_z"
+                    pos="-0.00481935 0.187188 -0.1"
+                    quat="0 -0.971358 0.23762 -0"/>
+            </body>
+          </body>
+        </body>
+        <!-- Link right_down_link_4 -->
+        <body name="right_down_link_4"
+              pos="-0.125 0.14824 -0.025"
+              quat="0.998733 0 -0 -0.050324">
+          <!-- Joint from fusioncomponent to right_down_link_4 -->
+          <joint axis="0 0 1"
+                 name="fl_rightdown"
+                 type="hinge"/>
+          <inertial pos="0 -0.0249946 -0.0125"
+                    mass="0.288986"
+                    fullinertia="0.000215405 7.13688e-05 0.000256672 -0 0 0"/>
+          <!-- Part right_down_link_4 -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.015 -0.03015 0"
+                quat="0.5 0.5 0.5 -0.5"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.015 -0.03015 0"
+                quat="0.5 0.5 0.5 -0.5"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <!-- Link middle_triangle_link_4 -->
+          <body name="middle_triangle_link_4"
+                pos="0 -0.05515 -0.025"
+                quat="1 0 0 -0">
+            <!-- Joint from right_down_link_4 to middle_triangle_link_4 -->
+            <joint axis="0 0 1"
+                   name="fl_rightdown2mid"
+                   type="hinge"/>
+            <inertial pos="-0.208889 -0.000780005 -0.0124371"
+                      mass="1.53075"
+                      fullinertia="0.000542424 0.0266285 0.0270118 -0.00137714 1.12556e-05 6.69321e-07"/>
+            <!-- Part middle_triangle_link_4 -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="-0.201099 -0.00404448 0"
+                  quat="0.512727 0.48694 0.512727 -0.48694"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="-0.201099 -0.00404448 0"
+                  quat="0.512727 0.48694 0.512727 -0.48694"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <!-- Frame closing_fl_leftdown2mid_2 -->
+            <site group="3"
+                  name="closing_fl_leftdown2mid_2"
+                  pos="-0.204945 0.0111878 0"
+                  quat="0 0.725106 -0.688637 -0"/>
+            <!-- Frame closing_fl_leftdown2mid_2_z -->
+            <site group="3"
+                  name="closing_fl_leftdown2mid_2_z"
+                  pos="-0.204945 0.0111878 -0.1"
+                  quat="0 0.725106 -0.688637 -0"/>
+            <!-- Frame closing_fl_mid2leg_1 -->
+            <site group="3"
+                  name="closing_fl_mid2leg_1"
+                  pos="-0.418692 -0.0216154 -0.025"
+                  quat="0 0.999667 0.0257872 -0"/>
+            <!-- Frame closing_fl_mid2leg_1_z -->
+            <site group="3"
+                  name="closing_fl_mid2leg_1_z"
+                  pos="-0.418692 -0.0216154 -0.125"
+                  quat="0 0.999667 0.0257872 -0"/>
+          </body>
+        </body>
+        <!-- Link right_down_link_5 -->
+        <body name="right_down_link_5"
+              pos="0.125016 0.14824 -0.21175"
+              quat="0.993447 0 -0 -0.11429">
+          <!-- Joint from fusioncomponent to right_down_link_5 -->
+          <joint axis="0 0 1"
+                 name="lm_rightdown"
+                 type="hinge"/>
+          <inertial pos="-0 -0.0249946 -0.0125"
+                    mass="0.288986"
+                    fullinertia="0.000215405 7.13688e-05 0.000256672 0 0 0"/>
+          <!-- Part right_down_link_5 -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.015 -0.03015 0"
+                quat="0.5 0.5 0.5 -0.5"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.015 -0.03015 0"
+                quat="0.5 0.5 0.5 -0.5"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <!-- Link middle_triangle_link_5 -->
+          <body name="middle_triangle_link_5"
+                pos="0 -0.05515 -0.025"
+                quat="1 -0 0 0">
+            <!-- Joint from right_down_link_5 to middle_triangle_link_5 -->
+            <joint axis="0 0 1"
+                   name="lm_rightdown2mid"
+                   type="hinge"/>
+            <inertial pos="-0.20695 -0.0284068 -0.0124371"
+                      mass="1.53075"
+                      fullinertia="0.0013601 0.0258108 0.0270118 -0.00474951 1.10681e-05 2.15243e-06"/>
+            <!-- Part middle_triangle_link_5 -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="-0.198797 -0.0306122 0"
+                  quat="0.543879 0.45188 0.543879 -0.45188"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="-0.198797 -0.0306122 0"
+                  quat="0.543879 0.45188 0.543879 -0.45188"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <!-- Frame closing_lm_leftdown2mid_2 -->
+            <site group="3"
+                  name="closing_lm_leftdown2mid_2"
+                  pos="-0.204624 -0.0160225 0"
+                  quat="0 0.769161 -0.639055 0"/>
+            <!-- Frame closing_lm_leftdown2mid_2_z -->
+            <site group="3"
+                  name="closing_lm_leftdown2mid_2_z"
+                  pos="-0.204624 -0.0160225 -0.1"
+                  quat="0 0.769161 -0.639055 0"/>
+            <!-- Frame closing_lm_mid2leg_1 -->
+            <site group="3"
+                  name="closing_lm_mid2leg_1"
+                  pos="-0.412153 -0.0768138 -0.025"
+                  quat="0 0.995759 0.0919987 -0"/>
+            <!-- Frame closing_lm_mid2leg_1_z -->
+            <site group="3"
+                  name="closing_lm_mid2leg_1_z"
+                  pos="-0.412153 -0.0768138 -0.125"
+                  quat="0 0.995759 0.0919987 -0"/>
+          </body>
+        </body>
+        <!-- Link right_down_link_6 -->
+        <body name="right_down_link_6"
+              pos="0.125 0.14824 -0.025"
+              quat="0.309607 0 0 -0.950865">
+          <!-- Joint from fusioncomponent to right_down_link_6 -->
+          <joint axis="0 0 1"
+                 name="bl_rightdown"
+                 type="hinge"/>
+          <inertial pos="0 0.0249946 -0.0125"
+                    mass="0.288986"
+                    fullinertia="0.000215405 7.13688e-05 0.000256672 0 0 0"/>
+          <!-- Part right_down_link_6 -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.015 0.03015 -0.025"
+                quat="0.5 -0.5 -0.5 -0.5"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.015 0.03015 -0.025"
+                quat="0.5 -0.5 -0.5 -0.5"
+                mesh="right_down_link"
+                material="right_down_link_material"/>
+          <!-- Link middle_triangle_link_6 -->
+          <body name="middle_triangle_link_6"
+                pos="0 0.05515 -0.025"
+                quat="1 0 -0 0">
+            <!-- Joint from right_down_link_6 to middle_triangle_link_6 -->
+            <joint axis="0 0 1"
+                   name="bl_rightdown2mid"
+                   type="hinge"/>
+            <inertial pos="-0.177074 0.110814 -0.0125629"
+                      mass="1.53075"
+                      fullinertia="0.00903019 0.0181407 0.0270118 0.0122991 -9.21053e-06 6.50402e-06"/>
+            <!-- Part middle_triangle_link_6 -->
+            <geom type="mesh"
+                  class="visual"
+                  pos="-0.168734 0.109481 -0.025"
+                  quat="0.327709 -0.626583 -0.327709 -0.626583"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <geom type="mesh"
+                  class="collision"
+                  pos="-0.168734 0.109481 -0.025"
+                  quat="0.327709 -0.626583 -0.327709 -0.626583"
+                  mesh="middle_triangle_link"
+                  material="middle_triangle_link_material"/>
+            <!-- Frame closing_bl_leftdown2mid_1 -->
+            <site group="3"
+                  name="closing_bl_leftdown2mid_1"
+                  pos="-0.180034 0.0985661 0"
+                  quat="0.954292 -0 0 -0.298875"/>
+            <!-- Frame closing_bl_leftdown2mid_1_z -->
+            <site group="3"
+                  name="closing_bl_leftdown2mid_1_z"
+                  pos="-0.180034 0.0985661 0.1"
+                  quat="0.954292 -0 0 -0.298875"/>
+            <!-- Frame closing_bl_mid2leg_1 -->
+            <site group="3"
+                  name="closing_bl_mid2leg_1"
+                  pos="-0.34435 0.239152 -0.025"
+                  quat="0 0.954292 -0.298875 0"/>
+            <!-- Frame closing_bl_mid2leg_1_z -->
+            <site group="3"
+                  name="closing_bl_mid2leg_1_z"
+                  pos="-0.34435 0.239152 -0.125"
+                  quat="0 0.954292 -0.298875 0"/>
+          </body>
+        </body>
+        <!-- Link left_down_link_4 -->
+        <body name="left_down_link_4"
+              pos="-0.333652 0.2041 -0.025"
+              quat="1 -0 -0 0">
+          <!-- Joint from fusioncomponent to left_down_link_4 -->
+          <joint axis="0 0 1"
+                 name="fl_leftdown"
+                 type="hinge"/>
+          <inertial pos="0.000162922 -0.0394997 -0.0125"
+                    mass="0.386736"
+                    fullinertia="0.000476793 9.6831e-05 0.000533339 1.56723e-06 0 0"/>
+          <!-- Part left_down_link_4 -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.0148044 -0.0474615 -0"
+                quat="0.00145827 0.707105 0.00145827 -0.707105"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.0148044 -0.0474615 -0"
+                quat="0.00145827 0.707105 0.00145827 -0.707105"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <!-- Frame closing_fl_leftdown2mid_1 -->
+          <site group="3"
+                name="closing_fl_leftdown2mid_1"
+                pos="0.000325844 -0.0789993 -0.025"
+                quat="0 -0.708564 0.705647 0"/>
+          <!-- Frame closing_fl_leftdown2mid_1_z -->
+          <site group="3"
+                name="closing_fl_leftdown2mid_1_z"
+                pos="0.000325844 -0.0789993 -0.125"
+                quat="0 -0.708564 0.705647 0"/>
+        </body>
+        <!-- Link left_down_link_5 -->
+        <body name="left_down_link_5"
+              pos="-0.0836358 0.2041 -0.21175"
+              quat="1 -0 -0 0">
+          <!-- Joint from fusioncomponent to left_down_link_5 -->
+          <joint axis="0 0 1"
+                 name="lm_leftdown"
+                 type="hinge"/>
+          <inertial pos="-0.00339411 -0.0393539 -0.0125"
+                    mass="0.386736"
+                    fullinertia="0.000473994 9.96301e-05 0.000533339 -3.25293e-05 0 0"/>
+          <!-- Part left_down_link_5 -->
+          <geom type="mesh"
+                class="visual"
+                pos="-0.0190175 -0.0459358 0"
+                quat="0.0304079 -0.706453 0.0304079 0.706453"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="-0.0190175 -0.0459358 0"
+                quat="0.0304079 -0.706453 0.0304079 0.706453"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <!-- Frame closing_lm_leftdown2mid_1 -->
+          <site group="3"
+                name="closing_lm_leftdown2mid_1"
+                pos="-0.00678822 -0.0787078 -0.025"
+                quat="0 -0.676045 0.736861 0"/>
+          <!-- Frame closing_lm_leftdown2mid_1_z -->
+          <site group="3"
+                name="closing_lm_leftdown2mid_1_z"
+                pos="-0.00678822 -0.0787078 -0.125"
+                quat="0 -0.676045 0.736861 0"/>
+        </body>
+        <!-- Link left_down_link_6 -->
+        <body name="left_down_link_6"
+              pos="0.333652 0.2041 -0.025"
+              quat="1 -0 -0 0">
+          <!-- Joint from fusioncomponent to left_down_link_6 -->
+          <joint axis="0 0 1"
+                 name="bl_leftdown"
+                 type="hinge"/>
+          <inertial pos="0.0136869 -0.0370529 -0.0125"
+                    mass="0.386736"
+                    fullinertia="0.000431178 0.000142446 0.000533339 0.000123506 0 0"/>
+          <!-- Part left_down_link_6 -->
+          <geom type="mesh"
+                class="visual"
+                pos="0.030495 -0.039266 -0.025"
+                quat="0.12445 -0.696069 -0.12445 -0.696069"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <geom type="mesh"
+                class="collision"
+                pos="0.030495 -0.039266 -0.025"
+                quat="0.12445 -0.696069 -0.12445 -0.696069"
+                mesh="left_down_link"
+                material="left_down_link_material"/>
+          <!-- Frame closing_bl_leftdown2mid_2 -->
+          <site group="3"
+                name="closing_bl_leftdown2mid_2"
+                pos="0.0273738 -0.0741058 -0.025"
+                quat="0.571619 -0 -0 0.820519"/>
+          <!-- Frame closing_bl_leftdown2mid_2_z -->
+          <site group="3"
+                name="closing_bl_leftdown2mid_2_z"
+                pos="0.0273738 -0.0741058 0.075"
+                quat="0.571619 -0 -0 0.820519"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+  <asset>
+    <mesh file="left_down_link.stl"/>
+    <mesh file="middle_triangle_link.stl"/>
+    <mesh file="top_link.stl"/>
+    <mesh file="right_down_link.stl"/>
+    <mesh file="base_link.stl"/>
+    <mesh file="left_triangle_link.stl"/>
+    <mesh file="fusioncomponent.stl"/>
+    <mesh file="rightmidbase.stl"/>
+    <mesh file="round_joint.stl"/>
+    <material name="base_link_material"
+              rgba="0.627451 0.627451 0.627451 1"/>
+    <material name="rightmidbase_material"
+              rgba="0.627451 0.627451 0.627451 1"/>
+    <material name="top_link_material"
+              rgba="0.627451 0.627451 0.627451 1"/>
+    <material name="round_joint_material"
+              rgba="0.627451 0.627451 0.627451 1"/>
+    <material name="left_triangle_link_material"
+              rgba="0.627451 0.627451 0.627451 1"/>
+    <material name="right_down_link_material"
+              rgba="0.627451 0.627451 0.627451 1"/>
+    <material name="middle_triangle_link_material"
+              rgba="0.627451 0.627451 0.627451 1"/>
+    <material name="left_down_link_material"
+              rgba="0.627451 0.627451 0.627451 1"/>
+    <material name="fusioncomponent_material"
+              rgba="0.627451 0.627451 0.627451 1"/>
+  </asset>
+  <actuator>
+
+    <velocity name="v_fl_rightdown"
+              joint="fl_rightdown"
+              kv="10"
+              ctrlrange="-10 10"/>
+    <velocity name="v_fr_rightdown"
+              joint="fr_rightdown"
+              kv="10"
+              ctrlrange="-10 10"/>
+    <velocity name="v_bl_rightdown"
+              joint="bl_rightdown"
+              kv="10"
+              ctrlrange="-10 10"/>
+    <velocity name="v_br_rightdown"
+              joint="br_rightdown"
+              kv="10"
+              ctrlrange="-10 10"/>    
+     <velocity name="v_lm_rightdown"
+              joint="lm_rightdown"
+              kv="10"
+              ctrlrange="-10 10"/>
+    <velocity name="v_rm_rightdown"
+              joint="rm_rightdown"
+              kv="10"
+              ctrlrange="-10 10"/>    
+  </actuator>
+  <sensor>
+    <accelerometer name="imu_accel"
+                   site="imu_site"
+                   noise="0.02"/>
+    <gyro name="imu_gyro"
+          site="imu_site"
+          noise="0.002"/>
+    <velocimeter name="imu_linvel"
+                 site="imu_site"/>
+    <framequat name="imu_quat"
+               objtype="site"
+               objname="imu_site"/>
+
+    <!-- Optional cheap forward probe for debugging only -->
+    <rangefinder name="forward_range"
+                 site="rgbd_origin"/>
+  </sensor>
+  <equality>
+    <connect site1="closing_fl_leftdown2mid_1"
+             site2="closing_fl_leftdown2mid_2"/>
+    <connect site1="closing_fl_leftdown2mid_1_z"
+             site2="closing_fl_leftdown2mid_2_z"/>
+    <connect site1="closing_fr_leftdown2mid_1"
+             site2="closing_fr_leftdown2mid_2"/>
+    <connect site1="closing_fr_leftdown2mid_1_z"
+             site2="closing_fr_leftdown2mid_2_z"/>
+    <connect site1="closing_rm_leftdown2mid_1"
+             site2="closing_rm_leftdown2mid_2"/>
+    <connect site1="closing_rm_leftdown2mid_1_z"
+             site2="closing_rm_leftdown2mid_2_z"/>
+    <connect site1="closing_lm_leftdown2mid_1"
+             site2="closing_lm_leftdown2mid_2"/>
+    <connect site1="closing_lm_leftdown2mid_1_z"
+             site2="closing_lm_leftdown2mid_2_z"/>
+    <connect site1="closing_bl_leftdown2mid_1"
+             site2="closing_bl_leftdown2mid_2"/>
+    <connect site1="closing_bl_leftdown2mid_1_z"
+             site2="closing_bl_leftdown2mid_2_z"/>
+    <connect site1="closing_br_leftdown2mid_1"
+             site2="closing_br_leftdown2mid_2"/>
+    <connect site1="closing_br_leftdown2mid_1_z"
+             site2="closing_br_leftdown2mid_2_z"/>
+    <connect site1="closing_fl_mid2leg_1"
+             site2="closing_fl_mid2leg_2"/>
+    <connect site1="closing_fl_mid2leg_1_z"
+             site2="closing_fl_mid2leg_2_z"/>
+    <connect site1="closing_fr_mid2leg_1"
+             site2="closing_fr_mid2leg_2"/>
+    <connect site1="closing_fr_mid2leg_1_z"
+             site2="closing_fr_mid2leg_2_z"/>
+    <connect site1="closing_rm_mid2leg_1"
+             site2="closing_rm_mid2leg_2"/>
+    <connect site1="closing_rm_mid2leg_1_z"
+             site2="closing_rm_mid2leg_2_z"/>
+    <connect site1="closing_lm_mid2leg_1"
+             site2="closing_lm_mid2leg_2"/>
+    <connect site1="closing_lm_mid2leg_1_z"
+             site2="closing_lm_mid2leg_2_z"/>
+    <connect site1="closing_bl_mid2leg_1"
+             site2="closing_bl_mid2leg_2"/>
+    <connect site1="closing_bl_mid2leg_1_z"
+             site2="closing_bl_mid2leg_2_z"/>
+    <connect site1="closing_br_mid2leg_1"
+             site2="closing_br_mid2leg_2"/>
+    <connect site1="closing_br_mid2leg_1_z"
+             site2="closing_br_mid2leg_2_z"/>
+  </equality>
+</mujoco>
