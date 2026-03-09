@@ -89,6 +89,12 @@ ros2 launch hexapod_mujoco_nav sim_nav.launch.py \
   use_ekf:=false
 ```
 
+## Launch Hexapod CPG Controller
+
+ros2 launch hexapod_mujoco_nav gait_phase_controller.launch.py
+
+ros2 run hexapod_mujoco_nav cmd_vel_repeater   --ros-args   -p input_topic:=/cmd_vel_key   -p output_topic:=/cmd_vel   -p publish_rate_hz:=15.0   -p hold_timeout_sec:=0.20   -p frame_id:=base_link
+
 ## Launch Keyboard Teleop
 
 New terminal:

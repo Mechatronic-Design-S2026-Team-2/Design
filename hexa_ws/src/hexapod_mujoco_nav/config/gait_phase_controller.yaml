@@ -1,0 +1,59 @@
+gait_phase_controller:
+  ros__parameters:
+    cmd_topic: /cmd_vel
+    joint_state_topic: /topic_based_joint_states
+    imu_topic: /imu/data
+    joint_command_topic: /topic_based_joint_commands
+
+    control_hz: 200.0
+    cmd_timeout_sec: 1.0
+    cmd_deadband_linear_x: 0.01
+    cmd_deadband_angular_z: 0.01
+
+    joint_names:
+      - fl_rightdown
+      - fr_rightdown
+      - lm_rightdown
+      - rm_rightdown
+      - bl_rightdown
+      - br_rightdown
+
+    joint_direction:
+      - 1.0
+      - -1.0
+      - 1.0
+      - -1.0
+      - 1.0
+      - -1.0
+
+    joint_zero_offsets:
+      - 0.0
+      - 0.0
+      - 0.0
+      - 0.0
+      - 0.0
+      - 0.0
+
+    forced_gait: tripod
+    wave_speed_threshold: 0.08
+
+    omega_gain_linear_x: 3.800651
+    omega_min_moving: 1.213023
+
+    omega_gain_angular_z: 2.295782
+    omega_min_turning: 1.147759
+    yaw_curve_scale: 0.473452
+
+    phase_kp: 3.726523
+    vel_damping: 1.331223
+    sync_gain: 3.489838
+    max_leg_speed: 8.0
+    max_stability_bias: 0.800962
+
+    roll_gain: 0.208203
+    pitch_gain: -0.332223
+    roll_rate_gain: -0.041299
+    pitch_rate_gain: -0.924927
+
+    enable_contact_feedback: false
+    contact_gain: 0.0

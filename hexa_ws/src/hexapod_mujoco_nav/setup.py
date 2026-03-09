@@ -9,11 +9,16 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages', [f'resource/{package_name}']),
         (f'share/{package_name}', ['package.xml']),
-        (f'share/{package_name}/launch', ['launch/sim_nav.launch.py']),
+        (f'share/{package_name}/launch', [
+            'launch/sim_nav.launch.py',
+            'launch/gait_phase_controller.launch.py',
+            'launch/teleop_testing.launch.py',
+        ]),
         (f'share/{package_name}/config', [
             'config/controllers.yaml',
             'config/nav2_params.yaml',
             'config/ekf.yaml',
+            'config/gait_phase_controller.yaml',
         ]),
         (f'share/{package_name}/urdf', ['urdf/hexapod_control.urdf.xacro']),
         (f'share/{package_name}/mjcf', ['mjcf/scene.xml']),
@@ -30,6 +35,8 @@ setup(
         'console_scripts': [
             'mujoco_bridge_node = hexapod_mujoco_nav.mujoco_bridge_node:main',
             'klann_cmdvel_bridge = hexapod_mujoco_nav.klann_cmdvel_bridge:main',
+            'gait_phase_controller = hexapod_mujoco_nav.gait_phase_controller:main',
+            'cmd_vel_repeater = hexapod_mujoco_nav.cmd_vel_repeater:main',
         ],
     },
 )
