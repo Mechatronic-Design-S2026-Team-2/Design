@@ -1,0 +1,11 @@
+std_msgs/Header header
+uint32 command_seq
+uint8[6] motor_id
+float32[6] commanded_motor_rpm
+float32[6] predicted_phase_velocity_rad_s
+float32[6] commanded_phase_velocity_rad_s
+float32[6] phase_target_rad
+bool[6] fresh
+float32 estimated_measurement_age_s
+float32 estimated_future_command_apply_delay_s
+float32 estimated_total_preview_s

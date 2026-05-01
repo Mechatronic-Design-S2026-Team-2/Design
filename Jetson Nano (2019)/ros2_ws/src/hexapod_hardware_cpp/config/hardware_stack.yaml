@@ -1,0 +1,164 @@
+wt901_imu_node:
+  ros__parameters:
+    serial_device: /dev/ttyTHS1
+    baud_rate: 9600
+    use_cached_baud: true
+    cache_file: ""
+    frame_id: imu_link
+    publish_euler_topic: true
+    accel_lpf_alpha: 0.35
+    gyro_lpf_alpha: 0.35
+    angle_lpf_alpha: 0.25
+    yaw_offset_rad: 0.0
+    xy_axes_quarter_turns_cw: 1
+    accel_bias_mps2: [0.0, 0.0, 0.0]
+    gyro_bias_rps: [0.0, 0.0, 0.0]
+    angle_bias_rad: [0.0, 0.0, 0.0]
+    accel_axis_sign: [1.0, 1.0, 1.0]
+    gyro_axis_sign: [1.0, 1.0, 1.0]
+    angle_axis_sign: [1.0, 1.0, 1.0]
+    orientation_covariance_diag: [0.02, 0.02, 0.04]
+    angular_velocity_covariance_diag: [0.01, 0.01, 0.02]
+    linear_acceleration_covariance_diag: [0.1, 0.1, 0.15]
+
+motor_state_aggregator_node:
+  ros__parameters:
+    input_topic: /motor_output_odom
+    motor_id_map: [3, 2, 1, 4, 5, 6]
+    # Canonical host leg order is [rf, rm, rb, lf, lm, lb].
+    # ESP odometry wire order is [rb, rm, rf, lf, lm, lb].
+    canonical_to_wire_index: [2, 1, 0, 3, 4, 5]
+    # Direct /motor_rpm_cmd subscription lets the phase observer unwrap raw
+    # single-turn encoder counts even when commands are published externally
+    # instead of through phase_command_router_node.
+    subscribe_direct_rpm_commands: true
+    direct_rpm_command_topic: /motor_rpm_cmd
+    wire_to_canonical_index: [2, 1, 0, 3, 4, 5]
+    # Canonical order [rf, rm, rb, lf, lm, lb]. These signs convert physical
+    # motor encoder/RPM direction into the linkage model's positive phase.
+    physical_to_model_phase_sign: [-1.0, -1.0, -1.0, 1.0, 1.0, 1.0]
+    phase_offset_rad: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    hold_last_direct_rpm_command: true
+    direct_rpm_command_timeout_s: 1.0
+    actuation_state_topic: hexapod/actuation_state
+    stale_timeout_s: 0.25
+    phase_rate_from_phase_diff_weight: 0.75
+    phase_rate_from_command_weight: 0.25
+    phase_rate_lowpass_alpha: 0.4
+    encoder_counts_per_motor_rev: 131072.0
+    gearbox_ratio: 50.0
+    raw_encoder_blend_alpha: 0.65
+    raw_encoder_count_quantization: true
+    # Latest ESP32 firmware reuses output_phase_rad[] for raw P18.32/P18.33
+    # single-turn encoder counts. Because the ESP publishes a cached six-element
+    # vector while its RS485 task updates one drive at a time, unchanged raw counts
+    # during a nonzero command are treated as stale cached samples, not as proof
+    # that the leg stopped.
+    raw_encoder_change_threshold_counts: 0.5
+    ignore_unchanged_raw_encoder_when_commanded: true
+    motor_speed_accel_ms: 250.0
+    motor_speed_decel_ms: 250.0
+    motor_speed_accel_rpm_per_s: 0.0
+    motor_speed_decel_rpm_per_s: 0.0
+    phase_prediction_innovation_limit_turns: 0.75
+    near_zero_command_phase_rate_rad_s: 0.05
+    max_phase_rate_rad_s: 8.0
+    transport_split_to_host: 0.5
+    delay_lowpass_alpha: 0.25
+    default_measurement_age_s: 0.02
+    default_future_apply_delay_s: 0.02
+    max_history_size: 128
+
+phase_command_router_node:
+  ros__parameters:
+    output_topic: /motor_rpm_cmd
+    actuation_state_topic: hexapod/actuation_state
+    # ESP command wire order is [rb, rm, rf, lf, lm, lb].
+    # Host canonical order is [rf, rm, rb, lf, lm, lb].
+    wire_to_canonical_index: [2, 1, 0, 3, 4, 5]
+    # Canonical order [rf, rm, rb, lf, lm, lb]. These signs convert model phase
+    # commands into physical ESP /motor_rpm_cmd motor signs. Right-side model-positive phase requires opposite physical motor RPM. Direct external
+    # /motor_rpm_cmd publishers should still publish physical wire RPM signs.
+    model_to_physical_motor_sign: [-1.0, -1.0, -1.0, 1.0, 1.0, 1.0]
+    motor_rpm_ff_is_physical: false
+    gear_ratio: 50.0
+    phase_kp_rpm_per_rad: 300.0
+    phase_kd_rpm_per_rad_s: 20.0
+    phase_target_max_error_rad: 0.8
+    rpm_limit: 500.0
+    rpm_slew_limit_per_s: 9000.0
+    command_timeout_s: 0.25
+    publish_actuation_state: true
+    use_delay_compensation: true
+    default_measurement_age_s: 0.02
+    default_future_apply_delay_s: 0.02
+    measurement_age_gain: 1.0
+    future_apply_delay_gain: 1.0
+    publish_only_on_change: true
+    max_publish_rate_hz: 50.0
+    publish_actuation_state_only_on_command: true
+
+body_state_estimator_node:
+  ros__parameters:
+    linkage_yaml: USE_LAUNCH_DEFAULT_linkage_measured_yaml
+    base_frame_id: base_link
+    odom_topic: /hexapod/kinematic_odom
+    odom_frame_id: hexapod_kinematic_odom
+    publish_tf: false
+    dt_hint_s: 0.01
+    twist_lowpass_alpha: 0.35
+    min_stance_confidence: 0.5
+    min_stance_legs: 3
+    zero_twist_without_stance: true
+    use_imu_roll_pitch: false
+    use_imu_yaw_absolute: false
+    use_imu_yaw_rate: true
+    body_heading_offset_rad: 0.0
+    imu_yaw_alpha: 0.0
+    imu_yaw_rate_alpha: 0.45
+    # Match the kinematic estimator to the same X mirroring used by the Klann visualizer.
+    # Current straight-line calibration: 73 in physical / 0.8511 m raw kinematic = 2.1786.
+    body_velocity_scale: 1.0
+    body_twist_axis_scale: [2.1786, 2.1786, 1.0]
+    mirror_kinematics_across_y_axis: true
+    phase_velocity_scale: 1.0
+    use_measurement_delay_compensation: true
+    measurement_age_gain: 1.0
+    publish_foot_debug: true
+
+lcd1602_status_node:
+  ros__parameters:
+    i2c_device: /dev/i2c-1
+    i2c_address: 39
+
+weighted_odom_fusion_node:
+  ros__parameters:
+    kinematic_odom_topic: /hexapod/kinematic_odom
+    imu_topic: imu/data_raw
+    fused_odom_topic: /hexapod/fused_odom
+    generic_odom_topic: /odom
+    publish_generic_odom: true
+    publish_tf: true
+    odom_frame_id: odom
+    base_frame_id: base_link
+    yaw_from_imu_weight: 0.0
+    force_planar_pose: true
+    # Keep odom->base_link planar for slam_toolbox/nav2. Publish IMU roll/pitch on
+    # imu/data_raw, but do not inject tilt into the 2D odom TF used by mapping.
+    roll_from_imu_weight: 0.0
+    pitch_from_imu_weight: 0.0
+    use_imu_angular_velocity: false
+    # Fuse ORB pose as a relative planar odometry source so the body skeleton
+    # moves in RViz/map while keeping roll/pitch out of the 2D TF tree.
+    use_orbslam_odom: true
+    orbslam_odom_topic: /hexapod/orbslam_odom
+    orbslam_timeout_s: 0.8
+    # During mapping bringup, trust ORB-SLAM relative translation for odom scale.
+    # If ORB metric scale is proven wrong, adjust position_scale in the ORB bridge,
+    # not this fusion weight.
+    orbslam_position_weight_xy: 1.0
+    orbslam_yaw_weight: 1.0
+    orbslam_trans_gate_m: 3.0
+    orbslam_yaw_gate_rad: 1.57
+    use_orbslam_linear_twist: false
+    orbslam_use_relative_origin: true

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>hexapod_orbslam_udp_bridge</name>
+  <version>0.2.0</version>
+  <description>ROS 2 C++ UDP bridge that ingests ORB-SLAM pose, scan, and map packets from a non-ROS process and republishes them as TF, Odometry, LaserScan, and PointCloud2.</description>
+  <maintainer email="team2@example.com">team2</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>tf2_ros</depend>
+  <exec_depend>slam_toolbox</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

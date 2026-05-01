@@ -1,0 +1,198 @@
+# Measured Klann linkage configuration derived from the supplied Desmos model.
+# Coordinates are expressed about the robot COM. Each leg linkage is solved in its
+# local x-z plane; mount.y is the leg's fixed lateral offset in the body frame.
+
+robot_frame_bbox:
+  min_x_m: -0.32779819
+  max_x_m: 0.42910181
+  min_y_m: -0.54833701
+  max_y_m: 0.55006299
+  min_z_m: -0.08550397
+  max_z_m: 0.37169603
+
+legs:
+  - name: right_front
+    mount: {shaft_x_m: -0.12466314, shaft_y_m: -0.42133701, shaft_z_m: -0.00070397, yaw_rad: 0.0}
+    input: {shaft_point: shaft, crank_tip_name: crank_tip, crank_radius_m: 0.0526034, phase_offset_rad: -1.5707963267948966}
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    use_lookup_table: true
+    lookup_resolution: 131072
+    lookup_file: "lut/right_front_17bit.klut"
+    lookup_generate_if_missing: true
+    lookup_save_generated: false
+    fixed_points:
+      shaft: [0.0, 0.0]
+      top_pivot: [-0.1893, 0.1532]
+      bottom_pivot: [-0.2117, -0.061]
+    unknown_points: [joint_k, joint_m, joint_q, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_k, length_m: 0.206375}
+      - {a: bottom_pivot, b: joint_k, length_m: 0.078994}
+      - {a: joint_k, b: joint_m, length_m: 0.219075}
+      - {a: top_pivot, b: joint_q, length_m: 0.1642618}
+      - {a: joint_m, b: joint_q, length_m: 0.1889125}
+      - {a: joint_m, b: foot, length_m: 0.4445}
+    angle_constraints:
+      - {a: crank_tip, vertex: joint_k, c: joint_m, angle_rad: 2.9356438}
+      - {a: joint_q, vertex: joint_m, c: foot, angle_rad: -2.6319565}
+    initial_guess:
+      joint_k: [-0.1749004929308745, 0.008898843448725166]
+      joint_m: [-0.3938508518287862, 0.01628775158698975]
+      joint_q: [-0.3469633545373437, 0.19928910473497874]
+      foot: [-0.28008650258671125, -0.4134073994695787]
+
+  - name: right_middle
+    mount: {shaft_x_m: 0.06300181, shaft_y_m: -0.54833701, shaft_z_m: -0.00070397, yaw_rad: 0.0}
+    input: {shaft_point: shaft, crank_tip_name: crank_tip, crank_radius_m: 0.0526034, phase_offset_rad: -1.5707963267948966}
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    use_lookup_table: true
+    lookup_resolution: 131072
+    lookup_file: "lut/right_middle_17bit.klut"
+    lookup_generate_if_missing: true
+    lookup_save_generated: false
+    fixed_points:
+      shaft: [0.0, 0.0]
+      top_pivot: [-0.1893, 0.1532]
+      bottom_pivot: [-0.2117, -0.061]
+    unknown_points: [joint_k, joint_m, joint_q, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_k, length_m: 0.206375}
+      - {a: bottom_pivot, b: joint_k, length_m: 0.078994}
+      - {a: joint_k, b: joint_m, length_m: 0.219075}
+      - {a: top_pivot, b: joint_q, length_m: 0.1642618}
+      - {a: joint_m, b: joint_q, length_m: 0.1889125}
+      - {a: joint_m, b: foot, length_m: 0.4445}
+    angle_constraints:
+      - {a: crank_tip, vertex: joint_k, c: joint_m, angle_rad: 2.9356438}
+      - {a: joint_q, vertex: joint_m, c: foot, angle_rad: -2.6319565}
+    initial_guess:
+      joint_k: [-0.17490049293087445, 0.008898843448725042]
+      joint_m: [-0.39385085182878604, 0.016287751586989474]
+      joint_q: [-0.34696335453734384, 0.19928910473497854]
+      foot: [-0.2800865025867104, -0.41340739946957883]
+
+  - name: right_back
+    mount: {shaft_x_m: 0.17686677, shaft_y_m: -0.42133701, shaft_z_m: -0.00070397, yaw_rad: 0.0}
+    input: {shaft_point: shaft, crank_tip_name: crank_tip, crank_radius_m: 0.0526034, phase_offset_rad: -1.5707963267948966}
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    use_lookup_table: true
+    lookup_resolution: 131072
+    lookup_file: "lut/right_back_17bit.klut"
+    lookup_generate_if_missing: true
+    lookup_save_generated: false
+    fixed_points:
+      shaft: [0.0, 0.0]
+      top_pivot: [0.1893, 0.1532]
+      bottom_pivot: [0.2117, -0.061]
+    unknown_points: [joint_k, joint_m, joint_q, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_k, length_m: 0.206375}
+      - {a: bottom_pivot, b: joint_k, length_m: 0.078994}
+      - {a: joint_k, b: joint_m, length_m: 0.219075}
+      - {a: top_pivot, b: joint_q, length_m: 0.1642618}
+      - {a: joint_m, b: joint_q, length_m: 0.1889125}
+      - {a: joint_m, b: foot, length_m: 0.4445}
+    angle_constraints:
+      - {a: crank_tip, vertex: joint_k, c: joint_m, angle_rad: -2.9356438}
+      - {a: joint_q, vertex: joint_m, c: foot, angle_rad: 2.6319565}
+    initial_guess:
+      joint_k: [0.23273174658319185, 0.015142745364613729]
+      joint_m: [0.45135308100861476, 0.02923415264165383]
+      joint_q: [0.34972769362551387, 0.18848305623437778]
+      foot: [0.4772823190517859, -0.41450893137712896]
+
+  - name: left_front
+    mount: {shaft_x_m: -0.12466314, shaft_y_m: 0.42311299, shaft_z_m: -0.00070397, yaw_rad: 0.0}
+    input: {shaft_point: shaft, crank_tip_name: crank_tip, crank_radius_m: 0.0526034, phase_offset_rad: -1.5707963267948966}
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    use_lookup_table: true
+    lookup_resolution: 131072
+    lookup_file: "lut/left_front_17bit.klut"
+    lookup_generate_if_missing: true
+    lookup_save_generated: false
+    fixed_points:
+      shaft: [0.0, 0.0]
+      top_pivot: [-0.1893, 0.1532]
+      bottom_pivot: [-0.2117, -0.061]
+    unknown_points: [joint_k, joint_m, joint_q, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_k, length_m: 0.206375}
+      - {a: bottom_pivot, b: joint_k, length_m: 0.078994}
+      - {a: joint_k, b: joint_m, length_m: 0.219075}
+      - {a: top_pivot, b: joint_q, length_m: 0.1642618}
+      - {a: joint_m, b: joint_q, length_m: 0.1889125}
+      - {a: joint_m, b: foot, length_m: 0.4445}
+    angle_constraints:
+      - {a: crank_tip, vertex: joint_k, c: joint_m, angle_rad: 2.9356438}
+      - {a: joint_q, vertex: joint_m, c: foot, angle_rad: -2.6319565}
+    initial_guess:
+      joint_k: [-0.1749004929308745, 0.008898843448725166]
+      joint_m: [-0.3938508518287862, 0.01628775158698975]
+      joint_q: [-0.3469633545373437, 0.19928910473497874]
+      foot: [-0.28008650258671125, -0.4134073994695787]
+
+  - name: left_middle
+    mount: {shaft_x_m: -0.02199819, shaft_y_m: 0.55011299, shaft_z_m: -0.00070397, yaw_rad: 0.0}
+    input: {shaft_point: shaft, crank_tip_name: crank_tip, crank_radius_m: 0.0526034, phase_offset_rad: -1.5707963267948966}
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    use_lookup_table: true
+    lookup_resolution: 131072
+    lookup_file: "lut/left_middle_17bit.klut"
+    lookup_generate_if_missing: true
+    lookup_save_generated: false
+    fixed_points:
+      shaft: [0.0, 0.0]
+      top_pivot: [-0.1893, 0.1532]
+      bottom_pivot: [-0.2117, -0.061]
+    unknown_points: [joint_k, joint_m, joint_q, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_k, length_m: 0.206375}
+      - {a: bottom_pivot, b: joint_k, length_m: 0.078994}
+      - {a: joint_k, b: joint_m, length_m: 0.219075}
+      - {a: top_pivot, b: joint_q, length_m: 0.1642618}
+      - {a: joint_m, b: joint_q, length_m: 0.1889125}
+      - {a: joint_m, b: foot, length_m: 0.4445}
+    angle_constraints:
+      - {a: crank_tip, vertex: joint_k, c: joint_m, angle_rad: 2.9356438}
+      - {a: joint_q, vertex: joint_m, c: foot, angle_rad: -2.6319565}
+    initial_guess:
+      joint_k: [-0.17490049293087448, 0.008898843448725166]
+      joint_m: [-0.3938508518287861, 0.01628775158698975]
+      joint_q: [-0.3469633545373437, 0.1992891047349788]
+      foot: [-0.28008650258671086, -0.4134073994695787]
+
+  - name: left_back
+    mount: {shaft_x_m: 0.17686677, shaft_y_m: 0.42308799, shaft_z_m: -0.00070397, yaw_rad: 0.0}
+    input: {shaft_point: shaft, crank_tip_name: crank_tip, crank_radius_m: 0.0526034, phase_offset_rad: -1.5707963267948966}
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    use_lookup_table: true
+    lookup_resolution: 131072
+    lookup_file: "lut/left_back_17bit.klut"
+    lookup_generate_if_missing: true
+    lookup_save_generated: false
+    fixed_points:
+      shaft: [0.0, 0.0]
+      top_pivot: [0.1893, 0.1532]
+      bottom_pivot: [0.2117, -0.061]
+    unknown_points: [joint_k, joint_m, joint_q, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_k, length_m: 0.206375}
+      - {a: bottom_pivot, b: joint_k, length_m: 0.078994}
+      - {a: joint_k, b: joint_m, length_m: 0.219075}
+      - {a: top_pivot, b: joint_q, length_m: 0.1642618}
+      - {a: joint_m, b: joint_q, length_m: 0.1889125}
+      - {a: joint_m, b: foot, length_m: 0.4445}
+    angle_constraints:
+      - {a: crank_tip, vertex: joint_k, c: joint_m, angle_rad: -2.9356438}
+      - {a: joint_q, vertex: joint_m, c: foot, angle_rad: 2.6319565}
+    initial_guess:
+      joint_k: [0.23273174658319185, 0.015142745364613729]
+      joint_m: [0.45135308100861476, 0.02923415264165383]
+      joint_q: [0.34972769362551387, 0.18848305623437778]
+      foot: [0.4772823190517859, -0.41450893137712896]

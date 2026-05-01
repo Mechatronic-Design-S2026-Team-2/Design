@@ -1,0 +1,16 @@
+This patch changes runtime odometry publishing to send raw P18.32/P18.33 single-turn encoder counts instead of ESP-computed output phase.
+
+Compatibility note:
+- The ROS message type is not changed in this ESP-IDF main directory.
+- Existing MotorOutputOdometryArray.output_phase_rad[6] is reused to carry raw encoder counts as float values.
+- For M17S 17-bit encoders, valid raw counts are 0..131071, which are exactly representable in float32.
+- motor_velocity_bridge_status.absolute_position_counts[] mirrors the same raw count for local status/debug.
+- The ESP no longer performs modulo unwrap, output gear-ratio division, or radians conversion in the runtime odometry path.
+
+Controller-side interpretation:
+  raw_motor_angle_mod_rad = 2*pi*raw_count/CONFIG_SERVO_ENCODER_COUNTS_PER_MOTOR_REV
+
+For continuous output phase, unwrap the raw modulo motor count on the ROS-side model/controller first, then calculate:
+  continuous_output_phase_rad = unwrapped_motor_counts*2*pi/(CONFIG_SERVO_ENCODER_COUNTS_PER_MOTOR_REV*CONFIG_SERVO_OUTPUT_GEAR_RATIO)
+
+Use the timing fields, commanded RPM, contact state, and IMU/model constraints upstream to choose the correct wrap count.

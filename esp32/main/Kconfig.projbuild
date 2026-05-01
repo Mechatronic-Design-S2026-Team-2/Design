@@ -1,0 +1,748 @@
+menu "DSY-RS RS485 and motor relay tuning"
+
+config SERVO_RS485_UART_TXD
+    int "RS485 UART TX GPIO"
+    range 0 39
+    default 17
+    help
+        ESP32 GPIO used for the RS485 UART TX signal.
+
+config SERVO_RS485_UART_RXD
+    int "RS485 UART RX GPIO"
+    range 0 39
+    default 16
+    help
+        ESP32 GPIO used for the RS485 UART RX signal.
+
+config SERVO_RS485_UART_DE_RE
+    int "RS485 transceiver DE/RE GPIO"
+    range -1 39
+    default 4
+    help
+        GPIO used to drive DE/RE on the RS485 transceiver.
+        Set to -1 only if transceiver direction is handled elsewhere.
+
+config SERVO_RS485_BAUD_RATE
+    int "RS485 baud rate"
+    range 1200 1000000
+    default 115200
+    help
+        Modbus/RS485 baud rate used to communicate with the DSY-RS drives.
+
+config SERVO_RS485_UART_RX_BUFFER_SIZE_BYTES
+    int "RS485 UART RX buffer size (bytes)"
+    range 128 8192
+    default 1024
+    help
+        UART driver RX ring-buffer size for the shared RS485 bus.
+
+config SERVO_RS485_UART_TX_BUFFER_SIZE_BYTES
+    int "RS485 UART TX buffer size (bytes)"
+    range 0 8192
+    default 1024
+    help
+        UART driver TX ring-buffer size for the shared RS485 bus.
+
+config SERVO_RS485_RESPONSE_TIMEOUT_US
+    int "RS485 response timeout (us)"
+    range 1000 10000000
+    default 300000
+    help
+        Maximum wait for a Modbus response chunk from a drive.
+
+config SERVO_RS485_TURNAROUND_DELAY_US
+    int "RS485 transmit-to-receive turnaround delay (us)"
+    range 0 100000
+    default 2000
+    help
+        Idle time after uart_wait_tx_done() before DE/RE returns to receive.
+
+config SERVO_RS485_POLL_PERIOD_US
+    int "RS485 background poll full-pass delay (us)"
+    range 0 60000000
+    default 100000
+    help
+        Delay after dsy_rs485_servo_task() finishes one full round-robin
+        telemetry pass over all active drives. This is not the runtime
+        motor_output_odom phase poller used by motor_velocity_bridge.
+
+config SERVO_RS485_INTER_DRIVE_POLL_DELAY_US
+    int "RS485 background poll inter-drive delay (us)"
+    range 0 1000000
+    default 5000
+    help
+        Delay between two adjacent drive polls inside one background
+        dsy_rs485_servo_task() telemetry pass. Set to 0 for the fastest
+        background pass. This task is separate from the runtime bridge worker.
+
+config SERVO_RS485_TRANSACTION_RETRY_COUNT
+    int "RS485 transaction retry count"
+    range 1 20
+    default 2
+    help
+        Number of attempts for each Modbus read/write transaction.
+
+config SERVO_RS485_RETRY_BACKOFF_US
+    int "RS485 retry backoff (us)"
+    range 0 10000000
+    default 4000
+    help
+        Delay between retry attempts after a failed Modbus transaction.
+
+config SERVO_RS485_RUNTIME_RESPONSE_TIMEOUT_US
+    int "Runtime RS485 response timeout (us)"
+    range 1000 1000000
+    default 50000
+    help
+        Short response timeout used only for live micro-ROS runtime RPM writes
+        and absolute-position reads. Startup configuration and diagnostics keep
+        using SERVO_RS485_RESPONSE_TIMEOUT_US.
+
+config SERVO_RS485_RUNTIME_TURNAROUND_DELAY_US
+    int "Runtime RS485 transmit-to-receive turnaround delay (us)"
+    range 0 100000
+    default 2000
+    help
+        Short DE/RE turnaround delay used only for live runtime transactions.
+        Keep the conservative bringup delay separate for startup reliability.
+
+config SERVO_RS485_RUNTIME_TRANSACTION_ATTEMPT_COUNT
+    int "Runtime RS485 transaction attempt count"
+    range 1 5
+    default 1
+    help
+        Attempts per runtime RPM write or absolute-position read. A changed RPM
+        value is not considered successfully sent until the drive acknowledges
+        it; failed changed values remain pending and are retried by the worker.
+
+config SERVO_RS485_RUNTIME_RETRY_BACKOFF_US
+    int "Runtime RS485 retry backoff (us)"
+    range 0 1000000
+    default 0
+    help
+        Delay between runtime retry attempts when the runtime attempt count is
+        greater than one. Default is zero because runtime defaults to one attempt.
+
+config SERVO_RS485_MODE_SWITCH_SETTLE_US
+    int "Drive mode-switch settle time (us)"
+    range 0 60000000
+    default 100000
+    help
+        Dwell after control-mode source/mode changes before subsequent writes.
+
+config SERVO_RS485_PARAMETER_WRITE_SETTLE_US
+    int "Drive parameter-write settle time (us)"
+    range 0 60000000
+    default 20000
+    help
+        Dwell between sequential drive parameter writes during configuration.
+
+config SERVO_RS485_STARTUP_SETTLE_US
+    int "RS485 startup settle time (us)"
+    range 0 60000000
+    default 200000
+    help
+        Delay after shared RS485 bus initialization before first transactions.
+
+config SERVO_TEST_ACTIVE_DRIVE_COUNT
+    int "Configured active drive count"
+    range 1 6
+    default 6
+    help
+        Number of servo drives that firmware will attempt to address.
+        This six-drive build targets servo IDs 1 through 6.
+
+config SERVO_ENABLE_GPIO
+    int "Servo-enable relay GPIO"
+    range 0 39
+    default 27
+    help
+        ESP32 GPIO that drives the shared servo-enable relay / DI1 control path.
+
+config SERVO_ENABLE_ACTIVE_LEVEL
+    int "Servo-enable relay active level"
+    range 0 1
+    default 0
+    help
+        Logic level driven on the configured servo-enable GPIO when the firmware
+        wants the servos enabled. Keep default 0 for the current active-low DI1
+        behavior through the external relay wiring.
+
+config POWER_PRECHARGE_SSR_GPIO
+    int "Precharge SSR GPIO"
+    range 0 39
+    default 19
+    help
+        ESP32 GPIO used to drive the precharge SSR / relay.
+
+config POWER_CONTACTOR_SSR_GPIO
+    int "Contactor SSR GPIO"
+    range 0 39
+    default 18
+    help
+        ESP32 GPIO used to drive the main contactor SSR / relay.
+
+config POWER_SSR_ACTIVE_LEVEL
+    int "Power relay active level"
+    range 0 1
+    default 1
+    help
+        Logic level that turns the precharge / contactor outputs on.
+
+config POWER_PRECHARGE_SENSE_ADC_GPIO
+    int "Precharge-sense ADC GPIO"
+    range 0 39
+    default 36
+    help
+        ADC-capable GPIO wired to the precharge divider midpoint.
+
+config POWER_PRECHARGE_DIVIDER_HIGH_OHMS
+    int "Precharge-sense divider high resistor (ohms)"
+    range 1 10000000
+    default 243000
+    help
+        Top resistor in the precharge-voltage sense divider.
+
+config POWER_PRECHARGE_DIVIDER_LOW_OHMS
+    int "Precharge-sense divider low resistor (ohms)"
+    range 1 10000000
+    default 10000
+    help
+        Bottom resistor in the precharge-voltage sense divider.
+
+config POWER_PRECHARGE_COMPLETE_MILLIVOLTS
+    int "Precharge-complete threshold (mV)"
+    range 0 100000
+    default 48000
+    help
+        Load-bus threshold used to declare the precharge stage complete.
+        The ADC voltage is reconstructed from POWER_PRECHARGE_DIVIDER_HIGH_OHMS
+        and POWER_PRECHARGE_DIVIDER_LOW_OHMS.
+
+config POWER_PRECHARGE_USE_ADC_GATE
+    bool "Use ADC feedback to complete precharge"
+    default y
+    help
+        If enabled, startup holds the precharge path closed until the measured
+        load-bus voltage reaches POWER_PRECHARGE_COMPLETE_MILLIVOLTS, or until
+        POWER_PRECHARGE_TIME_US expires. If disabled, POWER_PRECHARGE_TIME_US is
+        a fixed precharge delay.
+
+config POWER_PRECHARGE_REQUIRE_ADC
+    bool "Require valid ADC before closing contactor"
+    default y
+    depends on POWER_PRECHARGE_USE_ADC_GATE
+    help
+        If enabled, firmware refuses to close the contactor when the ADC is not
+        available or cannot be read. This is the safe default for ADC-gated
+        precharge.
+
+config POWER_PRECHARGE_TIME_US
+    int "Fixed precharge dwell time when ADC gate is disabled (us)"
+    range 0 120000000
+    default 20000000
+    help
+        Used only when POWER_PRECHARGE_USE_ADC_GATE is disabled, or when ADC
+        fallback is explicitly allowed. With ADC gating enabled, use
+        POWER_PRECHARGE_ADC_TIMEOUT_US for the timeout.
+
+config POWER_PRECHARGE_ADC_TIMEOUT_US
+    int "ADC-gated precharge timeout before failure (us)"
+    range 0 300000000
+    default 20000000
+    depends on POWER_PRECHARGE_USE_ADC_GATE
+    help
+        Maximum time to keep the precharge path enabled while waiting for the
+        measured load bus to reach POWER_PRECHARGE_COMPLETE_MILLIVOLTS. If this
+        expires, firmware opens both precharge and contactor outputs and returns
+        a precharge startup failure instead of closing the contactor.
+
+config POWER_PRECHARGE_MIN_DWELL_US
+    int "Precharge minimum dwell before ADC can pass (us)"
+    range 0 120000000
+    default 500000
+    help
+        Minimum time to keep the precharge path enabled before an ADC reading is
+        allowed to declare precharge complete.
+
+config POWER_PRECHARGE_POLL_PERIOD_US
+    int "Precharge ADC poll period (us)"
+    range 1000 5000000
+    default 50000
+    help
+        ADC polling period while waiting for precharge completion.
+
+config POWER_PRECHARGE_STABLE_SAMPLE_COUNT
+    int "Precharge ADC stable sample count"
+    range 1 100
+    default 3
+    help
+        Number of consecutive ADC samples at or above the completion threshold
+        required before the contactor is closed.
+
+config POWER_CONTACTOR_SETTLE_US
+    int "Contactor settle / precharge overlap time (us)"
+    range 0 10000000
+    default 250000
+    help
+        Additional dwell after the contactor is enabled before opening the
+        precharge path. During this interval the contactor and precharge path
+        are both enabled.
+
+config POWER_PRECHARGE_FAILURE_RETRY_DELAY_US
+    int "Delay before retry after precharge startup failure (us)"
+    range 0 120000000
+    default 5000000
+    help
+        Delay after an ADC precharge timeout or ADC failure before another
+        startup precharge attempt is made. During this delay, both power SSR
+        outputs are commanded off.
+
+config POWER_PRECHARGE_FAILURE_RETRY_FOREVER
+    bool "Retry precharge startup forever after failure"
+    default y
+    help
+        If enabled, a precharge timeout does not abort or reset the ESP32. The
+        firmware leaves the contactor open and retries after
+        POWER_PRECHARGE_FAILURE_RETRY_DELAY_US.
+
+config POWER_PRECHARGE_FAILURE_MAX_RETRIES
+    int "Maximum precharge startup retries before fail-stop"
+    range 1 1000
+    default 3
+    depends on !POWER_PRECHARGE_FAILURE_RETRY_FOREVER
+    help
+        Number of failed startup attempts allowed before the firmware enters a
+        fail-stop loop. The fail-stop loop keeps the precharge and contactor
+        outputs off and does not start the motor bridge.
+
+config POWER_PRECHARGE_REBOOT_AFTER_FAILED_RETRIES
+    bool "Reboot after maximum precharge startup retries"
+    default n
+    depends on !POWER_PRECHARGE_FAILURE_RETRY_FOREVER
+    help
+        If enabled, the ESP32 restarts after POWER_PRECHARGE_FAILURE_MAX_RETRIES
+        failed precharge attempts. The safer default is disabled, which leaves
+        the firmware in a fail-stop loop with both power outputs off.
+
+config MOTOR_BRIDGE_PREPARE_RETRY_DELAY_US
+    int "Pre-ROS drive prepare retry delay (us)"
+    range 0 120000000
+    default 2000000
+    help
+        Delay before retrying drive-preparation after a failed startup attempt.
+
+config MAIN_BUS_ADC_DIVIDER_NUMERATOR
+    int "Deprecated main-bus ADC divider numerator"
+    range 1 1000
+    default 253
+    help
+        Deprecated. motor_power_manager now reconstructs bus voltage from
+        POWER_PRECHARGE_DIVIDER_HIGH_OHMS and POWER_PRECHARGE_DIVIDER_LOW_OHMS.
+        This legacy value is kept only so older sdkconfig files do not break.
+
+config MAIN_BUS_ADC_DIVIDER_DENOMINATOR
+    int "Deprecated main-bus ADC divider denominator"
+    range 1 1000
+    default 10
+    help
+        Deprecated. motor_power_manager now reconstructs bus voltage from
+        POWER_PRECHARGE_DIVIDER_HIGH_OHMS and POWER_PRECHARGE_DIVIDER_LOW_OHMS.
+        This legacy value is kept only so older sdkconfig files do not break.
+
+endmenu
+
+menu "micro-ROS UART transport"
+
+config MICRO_ROS_UART_BAUD_RATE
+    int "micro-ROS UART baud rate"
+    range 9600 2000000
+    default 921600
+    help
+        UART baud rate used by the custom micro-ROS transport on UART0.
+
+config MICRO_ROS_UART_RX_BUFFER_SIZE
+    int "micro-ROS UART RX buffer size"
+    range 128 8192
+    default 1024
+    help
+        RX ring-buffer size for the ESP32 UART driver used by micro-ROS.
+
+config MICRO_ROS_UART_TX_BUFFER_SIZE
+    int "micro-ROS UART TX buffer size"
+    range 0 8192
+    default 1024
+    help
+        TX ring-buffer size for the ESP32 UART driver used by micro-ROS.
+
+config MICRO_ROS_UART_READ_CHUNK_TIMEOUT_US
+    int "micro-ROS UART read chunk timeout (us)"
+    range 0 1000000
+    default 2000
+    help
+        Per-read chunk wait used while accumulating one XRCE frame from UART.
+        Lower values reduce latency. Higher values can improve tolerance to
+        fragmented serial packets.
+
+config MICRO_ROS_UART_WRITE_TIMEOUT_US
+    int "micro-ROS UART write completion timeout (us)"
+    range 1000 10000000
+    default 100000
+    help
+        Timeout passed to uart_wait_tx_done() after each micro-ROS UART write.
+
+config MICRO_ROS_UART_OPEN_FLUSH_INPUT
+    bool "Flush micro-ROS UART RX buffer when transport opens"
+    default y
+    help
+        Clear any stale bytes from the UART RX buffer before XRCE traffic begins.
+
+config MICRO_ROS_UART_POST_OPEN_SETTLE_US
+    int "micro-ROS UART post-open settle delay (us)"
+    range 0 10000000
+    default 0
+    help
+        Optional delay after UART driver setup and RX flush before micro-ROS traffic.
+
+config MICRO_ROS_SILENCE_CONSOLE_LOGGING_ON_START
+    bool "Silence console logging when micro-ROS starts on UART0"
+    default y
+    help
+        Disable ESP_LOG console output once micro-ROS is about to start when the
+        custom transport uses UART0. This avoids console logs corrupting the XRCE
+        serial stream.
+
+config MICRO_ROS_APP_STACK
+    int "micro-ROS bridge task stack size"
+    range 4096 32768
+    default 8192
+    help
+        Stack size passed to xTaskCreate for the direct RPM bridge task.
+
+config MICRO_ROS_APP_TASK_PRIO
+    int "micro-ROS bridge task priority"
+    range 1 24
+    default 5
+    help
+        FreeRTOS priority for the direct RPM bridge task.
+
+
+config MICRO_ROS_TASK_CORE
+    int "micro-ROS bridge task core"
+    range 0 1
+    default 0
+    help
+        CPU core used for the micro-ROS executor and odometry publisher task.
+
+config RS485_WORKER_TASK_STACK
+    int "RS485 worker task stack size"
+    range 4096 32768
+    default 6144
+    help
+        Stack size for the dedicated RS485 worker task that applies RPM
+        commands and polls encoder positions.
+
+config RS485_WORKER_TASK_PRIO
+    int "RS485 worker task priority"
+    range 1 24
+    default 6
+    help
+        FreeRTOS priority for the dedicated RS485 worker task.
+
+config RS485_WORKER_TASK_CORE
+    int "RS485 worker task core"
+    range 0 1
+    default 1
+    help
+        CPU core used for the dedicated RS485 worker task.
+
+config RS485_WORKER_LOOP_DELAY_US
+    int "RS485 worker loop delay (us)"
+    range 0 100000
+    default 1000
+    help
+        Delay at the end of each RS485 worker loop. Set to 0 for maximum
+        servicing rate or raise to reduce CPU load.
+
+config MOTOR_RPM_SUBSCRIPTION_KEEP_LAST_DEPTH
+    int "motor_rpm_cmd subscription keep-last depth"
+    range 1 16
+    default 1
+    help
+        QoS history depth for the direct per-motor RPM command subscription.
+        Keep at 1 for latest-command-only behavior and minimum stale-command
+        backlog.
+
+config MICRO_ROS_EXECUTOR_SPIN_TIMEOUT_US
+    int "micro-ROS executor spin timeout (us)"
+    range 0 1000000
+    default 5000
+    help
+        Timeout used by rclc_executor_spin_some(). A small nonzero value usually
+        improves serial RX reliability over a pure zero-timeout polling loop.
+
+config MICRO_ROS_BRIDGE_MAIN_LOOP_DELAY_US
+    int "micro-ROS bridge main-loop delay (us)"
+    range 0 100000
+    default 1000
+    help
+        Delay inserted at the end of each bridge loop. Set to 0 for maximum loop
+        rate, or raise it to reduce CPU load.
+
+config MICRO_ROS_COMMAND_APPLY_MIN_INTERVAL_US
+    int "Minimum interval between applying latched RPM commands (us)"
+    range 0 1000000
+    default 0
+    help
+        The subscription callback only updates the local RPM latch. The bridge loop
+        applies that latched command to the drives. Set this to a nonzero value to
+        debounce or throttle how often newly received latched commands are pushed to
+        the RS485 bus.
+
+endmenu
+
+menu "Direct motor-RPM bridge settings"
+
+config SERVO_SAFE_MAX_MOTOR_RPM
+    int "Safe motor-side RPM limit"
+    range 1 3000
+    default 3000
+    help
+        Max allowed motor input-shaft speed command in RPM.
+
+config SERVO_SAFE_TORQUE_LIMIT_TENTHS_PERCENT_RATED
+    int "Safe torque limit (0.1% rated)"
+    range 1 1000
+    default 393
+    help
+        Max runtime torque limit in drive native units of 0.1% rated torque.
+
+config SERVO_ENCODER_COUNTS_PER_MOTOR_REV
+    int "Encoder counts per motor revolution"
+    range 1 1048576
+    default 131072
+    help
+        Counts per motor-side revolution used to convert raw absolute encoder
+        motion from P18.32/P18.34 into output-shaft odometry. DSY60 M17 motors
+        use 17-bit feedback, so the default is 131072 counts per motor revolution.
+
+config SERVO_OUTPUT_GEAR_RATIO
+    int "Motor-to-output gear ratio"
+    range 1 1000
+    default 50
+    help
+        Fixed reduction from motor input shaft to final output shaft.
+
+config SERVO_SPEED_COMMAND_ACCEL_MS
+    int "Speed command accel time register P05.05 (ms)"
+    range 0 10000
+    default 250
+    help
+        Native DSY drive acceleration-time register value. This remains in
+        milliseconds because it is written directly to P05.05.
+
+config SERVO_SPEED_COMMAND_DECEL_MS
+    int "Speed command decel time register P05.06 (ms)"
+    range 0 10000
+    default 250
+    help
+        Native DSY drive deceleration-time register value. This remains in
+        milliseconds because it is written directly to P05.06.
+
+config MOTOR_BRIDGE_PRE_CONFIG_OFF_DWELL_US
+    int "Pre-config servo-off dwell (us)"
+    range 0 60000000
+    default 3000000
+    help
+        Startup dwell after forcing the shared servo-enable output off and
+        before waiting for the drives to report readable telemetry.
+
+config MOTOR_BRIDGE_COLD_READY_STABLE_READS
+    int "Cold-ready stable read count"
+    range 1 200
+    default 20
+    help
+        Number of consecutive successful ready-read passes required for each
+        drive before startup configuration proceeds.
+
+config MOTOR_BRIDGE_COLD_READY_TIMEOUT_US
+    int "Cold-ready timeout per drive (us)"
+    range 1000 120000000
+    default 15000000
+    help
+        Timeout while waiting for one drive to produce the required stable
+        readable startup telemetry.
+
+config MOTOR_BRIDGE_COLD_READY_POLL_US
+    int "Cold-ready poll period (us)"
+    range 1000 5000000
+    default 200000
+    help
+        Delay between startup ready-read attempts while waiting for a cold
+        drive to become readable.
+
+config MOTOR_BRIDGE_TORQUE_PRIME_ENABLE_SETTLE_US
+    int "Torque-prime enable settle time (us)"
+    range 0 60000000
+    default 3000000
+    help
+        Startup dwell after enabling the drives in torque-prime mode before
+        zeroing the torque command and switching to speed mode.
+
+config MOTOR_BRIDGE_TORQUE_ZERO_INTER_DRIVE_DELAY_US
+    int "Torque-zero inter-drive delay (us)"
+    range 0 1000000
+    default 10000
+    help
+        Delay between sequential P06.05 zero-torque writes during the startup
+        torque-prime cleanup pass. Set to 0 to write the six zeroes back-to-back.
+
+config MOTOR_BRIDGE_POST_PRIME_OFF_DWELL_US
+    int "Post-prime servo-off dwell (us)"
+    range 0 60000000
+    default 1000000
+    help
+        Startup dwell after disabling the drives following torque-prime cleanup
+        and before speed-mode configuration begins.
+
+config MOTOR_BRIDGE_PRE_ENABLE_ZERO_DWELL_US
+    int "Pre-enable zero-speed dwell (us)"
+    range 0 60000000
+    default 500000
+    help
+        Startup dwell after writing the initial zero RPM command and before
+        asserting the shared servo-enable line for normal speed mode.
+
+config MOTOR_BRIDGE_SPEED_ENABLE_SETTLE_US
+    int "Speed-mode enable settle time (us)"
+    range 0 60000000
+    default 3000000
+    help
+        Startup dwell after enabling the drives in normal speed mode before
+        the initial telemetry poll/cache seed.
+
+config SERVO_COMMAND_LATCH_RESEND_PERIOD_US
+    int "Latched command resend period (us)"
+    range 0 1000000
+    default 20000
+    help
+        Optional periodic writeback rate for the most recently received per-motor RPM command.
+        This value is ignored unless SERVO_RUNTIME_ENABLE_PERIODIC_RPM_RESEND is enabled.
+        Keep at 0 for the normal runtime path, which writes only changed RPM values.
+
+config SERVO_RUNTIME_ENABLE_PERIODIC_RPM_RESEND
+    bool "Enable periodic resend of unchanged runtime RPM commands"
+    default n
+    help
+        Normally disabled. When disabled, the runtime RS485 worker writes a motor
+        RPM only when its target differs from the last acknowledged value. Enable
+        only if the drive firmware is later found to require command refreshes.
+
+
+config SERVO_ENCODER_SWEEP_PERIOD_US
+    int "Strict six-drive raw-encoder sweep period (us)"
+    range 0 1000000
+    default 25000
+    help
+        Start-to-start period for the runtime six-drive raw P18.32 encoder
+        sweep. The worker reads one drive, returns to the top of the scheduler,
+        and then reads the next drive in the active sweep unless a pending
+        all-zero RPM command needs to preempt it. Set to 0 to disable runtime
+        raw-encoder sweep polling.
+
+        The default 25000 us target is a practical starting point for sub-1000
+        motor-RPM tests at 115200 baud. Lower values raise encoder freshness but
+        increase RS485 bus pressure and can delay nonzero command writes.
+
+config SERVO_ENCODER_SWEEP_STOP_PREEMPTION
+    bool "Let all-zero RPM commands preempt encoder sweep"
+    default y
+    help
+        When enabled, a pending all-zero RPM vector is applied before the next
+        raw-encoder sweep transaction. Preemption happens between Modbus
+        transactions; an in-flight read is not aborted.
+
+config SERVO_POSITION_POLL_PERIOD_US
+    int "Deprecated compatibility: encoder sweep period (us)"
+    range 0 1000000
+    default 25000
+    help
+        Deprecated compatibility symbol. Runtime raw-encoder polling now uses
+        SERVO_ENCODER_SWEEP_PERIOD_US as a strict six-drive sweep period rather
+        than a per-drive round-robin spacing.
+
+config SERVO_POSITION_HIGH_PRIORITY_MAX_GAP_US
+    int "Deprecated unused high-priority poll gap (us)"
+    range 0 1000000
+    default 0
+    help
+        Deprecated compatibility symbol. The runtime worker now uses strict
+        six-drive sweeps with all-zero command preemption instead of injecting
+        high-priority single-drive polls while command writes are pending.
+
+config SERVO_BATTERY_CACHE_UPDATE_PERIOD_US
+    int "Battery cache update period (us)"
+    range 0 5000000
+    default 50000
+    help
+        Spacing between refreshes of the cached battery voltage copied from the
+        ESP32 main-bus ADC monitor.
+
+config SERVO_ODOM_STOP_SPEED_RPM
+    int "Deprecated: odometry stopped-speed threshold (unused)"
+    range 0 100
+    default 2
+    help
+        Retained so older sdkconfig files still parse. The current raw-encoder
+        odometry path does not read P18.01 speed feedback and does not use this
+        value.
+
+config SERVO_ODOM_STATIONARY_NOISE_COUNTS
+    int "Deprecated: stationary odometry count-jump allowance (unused)"
+    range 0 131072
+    default 2048
+    help
+        Retained so older sdkconfig files still parse. The current raw-encoder
+        odometry path accepts raw encoder deltas directly.
+
+config SERVO_ODOM_SPEED_MARGIN_RPM
+    int "Deprecated: moving odometry plausibility RPM margin (unused)"
+    range 0 1000
+    default 30
+    help
+        Retained so older sdkconfig files still parse. The current raw-encoder
+        odometry path does not apply speed-based plausibility filtering.
+
+config SERVO_ODOM_MIN_DELTA_MARGIN_COUNTS
+    int "Deprecated: moving odometry minimum count margin (unused)"
+    range 0 262144
+    default 8192
+    help
+        Retained so older sdkconfig files still parse. The current raw-encoder
+        odometry path does not apply speed-based jump rejection.
+
+config SERVO_ROTATE_COMMAND_WRITE_START_INDEX
+    bool "Rotate first drive in each six-drive RPM write pass"
+    default y
+    help
+        Rotate which drive is written first for each full six-drive command
+        apply. This reduces fixed leg-to-leg timing bias, so the same leg is
+        not always first or last to receive a stop or speed update.
+config SERVO_TELEMETRY_POLL_PERIOD_US
+    int "Deprecated unused telemetry poll spacing (us)"
+    range 0 1000000
+    default 10000
+    help
+        Deprecated compatibility symbol. The active runtime raw-encoder polling knob is
+        SERVO_ENCODER_SWEEP_PERIOD_US. The active background telemetry knobs are
+        SERVO_RS485_POLL_PERIOD_US and SERVO_RS485_INTER_DRIVE_POLL_DELAY_US.
+
+config SERVO_ODOMETRY_PUBLISH_PERIOD_US
+    int "Motor odometry publish period (us)"
+    range 0 5000000
+    default 50000
+    help
+        Rate at which the bridge republishes output-shaft odometry. Set to 0 to disable
+        periodic odometry publishing.
+
+endmenu

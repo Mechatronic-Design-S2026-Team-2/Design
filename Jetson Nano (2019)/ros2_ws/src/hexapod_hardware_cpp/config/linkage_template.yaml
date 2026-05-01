@@ -1,0 +1,121 @@
+legs:
+  - name: left_front
+    mount:
+      shaft_x_m: 0.22
+      shaft_y_m: 0.14
+      yaw_rad: 0.0
+    input:
+      shaft_point: shaft
+      crank_tip_name: crank_tip
+      crank_radius_m: 0.018
+      phase_offset_rad: 0.0
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    fixed_points:
+      shaft: [0.0, 0.0]
+      pivot_a: [0.05, -0.01]
+      pivot_b: [0.10, -0.03]
+    unknown_points: [joint_b, joint_c, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_b, length_m: 0.06}
+      - {a: pivot_a, b: joint_b, length_m: 0.08}
+      - {a: joint_b, b: joint_c, length_m: 0.06}
+      - {a: pivot_b, b: joint_c, length_m: 0.07}
+      - {a: joint_c, b: foot, length_m: 0.10}
+      - {a: joint_b, b: foot, length_m: 0.11}
+    angle_constraints:
+      - {a: joint_b, vertex: joint_c, c: foot, angle_rad: 2.356194490192345}
+    initial_guess:
+      joint_b: [0.03, -0.05]
+      joint_c: [0.08, -0.08]
+      foot: [0.14, -0.16]
+
+  - name: left_middle
+    mount: {shaft_x_m: 0.00, shaft_y_m: 0.16, yaw_rad: 0.0}
+    input: {shaft_point: shaft, crank_tip_name: crank_tip, crank_radius_m: 0.018, phase_offset_rad: 2.0943951023931953}
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    fixed_points: {shaft: [0.0, 0.0], pivot_a: [0.05, -0.01], pivot_b: [0.10, -0.03]}
+    unknown_points: [joint_b, joint_c, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_b, length_m: 0.06}
+      - {a: pivot_a, b: joint_b, length_m: 0.08}
+      - {a: joint_b, b: joint_c, length_m: 0.06}
+      - {a: pivot_b, b: joint_c, length_m: 0.07}
+      - {a: joint_c, b: foot, length_m: 0.10}
+      - {a: joint_b, b: foot, length_m: 0.11}
+    angle_constraints:
+      - {a: joint_b, vertex: joint_c, c: foot, angle_rad: 2.356194490192345}
+    initial_guess: {joint_b: [0.03, -0.05], joint_c: [0.08, -0.08], foot: [0.14, -0.16]}
+
+  - name: left_rear
+    mount: {shaft_x_m: -0.22, shaft_y_m: 0.14, yaw_rad: 0.0}
+    input: {shaft_point: shaft, crank_tip_name: crank_tip, crank_radius_m: 0.018, phase_offset_rad: 4.1887902047863905}
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    fixed_points: {shaft: [0.0, 0.0], pivot_a: [0.05, -0.01], pivot_b: [0.10, -0.03]}
+    unknown_points: [joint_b, joint_c, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_b, length_m: 0.06}
+      - {a: pivot_a, b: joint_b, length_m: 0.08}
+      - {a: joint_b, b: joint_c, length_m: 0.06}
+      - {a: pivot_b, b: joint_c, length_m: 0.07}
+      - {a: joint_c, b: foot, length_m: 0.10}
+      - {a: joint_b, b: foot, length_m: 0.11}
+    angle_constraints:
+      - {a: joint_b, vertex: joint_c, c: foot, angle_rad: 2.356194490192345}
+    initial_guess: {joint_b: [0.03, -0.05], joint_c: [0.08, -0.08], foot: [0.14, -0.16]}
+
+  - name: right_front
+    mount: {shaft_x_m: 0.22, shaft_y_m: -0.14, yaw_rad: 3.141592653589793}
+    input: {shaft_point: shaft, crank_tip_name: crank_tip, crank_radius_m: 0.018, phase_offset_rad: 3.141592653589793}
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    fixed_points: {shaft: [0.0, 0.0], pivot_a: [0.05, -0.01], pivot_b: [0.10, -0.03]}
+    unknown_points: [joint_b, joint_c, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_b, length_m: 0.06}
+      - {a: pivot_a, b: joint_b, length_m: 0.08}
+      - {a: joint_b, b: joint_c, length_m: 0.06}
+      - {a: pivot_b, b: joint_c, length_m: 0.07}
+      - {a: joint_c, b: foot, length_m: 0.10}
+      - {a: joint_b, b: foot, length_m: 0.11}
+    angle_constraints:
+      - {a: joint_b, vertex: joint_c, c: foot, angle_rad: 2.356194490192345}
+    initial_guess: {joint_b: [0.03, -0.05], joint_c: [0.08, -0.08], foot: [0.14, -0.16]}
+
+  - name: right_middle
+    mount: {shaft_x_m: 0.0, shaft_y_m: -0.16, yaw_rad: 3.141592653589793}
+    input: {shaft_point: shaft, crank_tip_name: crank_tip, crank_radius_m: 0.018, phase_offset_rad: 5.235987755982989}
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    fixed_points: {shaft: [0.0, 0.0], pivot_a: [0.05, -0.01], pivot_b: [0.10, -0.03]}
+    unknown_points: [joint_b, joint_c, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_b, length_m: 0.06}
+      - {a: pivot_a, b: joint_b, length_m: 0.08}
+      - {a: joint_b, b: joint_c, length_m: 0.06}
+      - {a: pivot_b, b: joint_c, length_m: 0.07}
+      - {a: joint_c, b: foot, length_m: 0.10}
+      - {a: joint_b, b: foot, length_m: 0.11}
+    angle_constraints:
+      - {a: joint_b, vertex: joint_c, c: foot, angle_rad: 2.356194490192345}
+    initial_guess: {joint_b: [0.03, -0.05], joint_c: [0.08, -0.08], foot: [0.14, -0.16]}
+
+  - name: right_rear
+    mount: {shaft_x_m: -0.22, shaft_y_m: -0.14, yaw_rad: 3.141592653589793}
+    input: {shaft_point: shaft, crank_tip_name: crank_tip, crank_radius_m: 0.018, phase_offset_rad: 1.0471975511965976}
+    foot_point_name: foot
+    stance_phase_window_rad: [0.0, 3.141592653589793]
+    fixed_points: {shaft: [0.0, 0.0], pivot_a: [0.05, -0.01], pivot_b: [0.10, -0.03]}
+    unknown_points: [joint_b, joint_c, foot]
+    distance_constraints:
+      - {a: crank_tip, b: joint_b, length_m: 0.06}
+      - {a: pivot_a, b: joint_b, length_m: 0.08}
+      - {a: joint_b, b: joint_c, length_m: 0.06}
+      - {a: pivot_b, b: joint_c, length_m: 0.07}
+      - {a: joint_c, b: foot, length_m: 0.10}
+      - {a: joint_b, b: foot, length_m: 0.11}
+    angle_constraints:
+      - {a: joint_b, vertex: joint_c, c: foot, angle_rad: 2.356194490192345}
+    initial_guess: {joint_b: [0.03, -0.05], joint_c: [0.08, -0.08], foot: [0.14, -0.16]}

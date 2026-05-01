@@ -1,0 +1,12 @@
+std_msgs/Header header
+bool shared_enable
+bool[2] comm_ok
+uint8[2] slave_address
+uint16[2] servo_status_word
+uint8[2] last_modbus_exception_code
+float32[2] output_position_rad
+float32[2] output_velocity_rad_s
+float32[2] motor_velocity_rpm
+float32[2] bus_voltage_v
+float32[2] phase_current_a
+uint16[2] applied_torque_limit_tenths_percent_rated

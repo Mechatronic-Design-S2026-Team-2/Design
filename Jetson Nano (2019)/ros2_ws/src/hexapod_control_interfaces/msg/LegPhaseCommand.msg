@@ -1,0 +1,9 @@
+std_msgs/Header header
+uint8[6] motor_id
+float32[6] phase_target_rad
+float32[6] phase_velocity_rad_s
+float32[6] motor_rpm_ff
+bool use_phase_targets
+bool use_phase_velocity
+bool use_motor_rpm_ff
+uint8 gait_mode

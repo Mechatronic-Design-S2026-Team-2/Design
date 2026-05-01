@@ -1,0 +1,7 @@
+<library path="nav2_klann_controller">
+  <class
+    type="hexapod_nav_cpp::Nav2KlannController"
+    base_class_type="nav2_core::Controller">
+    <description>Klann phase-level controller plugin draft.</description>
+  </class>
+</library>

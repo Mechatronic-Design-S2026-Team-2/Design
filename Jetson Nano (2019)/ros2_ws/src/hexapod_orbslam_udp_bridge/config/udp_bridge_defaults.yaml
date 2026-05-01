@@ -1,0 +1,59 @@
+/**:
+  ros__parameters:
+    udp_bind_ip: "0.0.0.0"
+    udp_port: 5005
+
+    # Frames used by slam_toolbox:
+    # slam_toolbox consumes /scan and odom->base_link, then publishes map->odom.
+    odom_frame: "odom"
+    base_frame: "base_link"
+
+    # Topic names
+    odom_topic: "/hexapod/orbslam_odom"
+    scan_topic: "/scan"
+    scan_frame: "orbslam_scan_frame"
+    map_topic: "/orbslam/map_points"
+    map_frame: "odom"
+
+    # Publish ORB-SLAM pose as odom->base_link for first mapping bringup.
+    # If a separate leg/IMU odometry estimator owns odom->base_link, set
+    # publish_odom=false and publish_tf=false in the launch command.
+    publish_odom: true
+    publish_tf: false
+    publish_scan: true
+    publish_map: true
+
+    # If true, interpret incoming pose as camera_optical_frame pose and convert
+    # to base_link pose using camopt_to_base_{x,y,z}.
+    apply_optical_to_base: true
+
+    # Raw ORB-SLAM/OpenCV optical axes:
+    # +X right, +Y down, +Z forward.
+    # ROS body/laser axes:
+    # +X forward, +Y left, +Z up.
+    convert_orbslam_to_ros_axes: false
+    convert_scan_optical_to_ros: true
+
+    # RGB-D ORB-SLAM should already be metric.
+    position_scale: 1.382
+
+    # Camera optical -> base_link translation, expressed in camera optical axes.
+    # For camera 0.2794 m forward of base_link: [0, 0, -0.2794].
+    camopt_to_base_x: 0.0
+    camopt_to_base_y: 0.0
+    camopt_to_base_z: -0.2794
+
+    # Use sender stamps by default. Set false if host/container clocks are bad.
+    use_packet_stamp: false
+
+    # Do not publish stale/lost tracking as odom TF for slam_toolbox.
+    publish_when_lost: false
+    publish_scan_when_lost: false
+
+    # Stamp the scan with the last pose stamp to avoid TF extrapolation failures
+    # in slam_toolbox when scan packets arrive milliseconds after pose packets.
+    stamp_scan_with_latest_pose: true
+
+    # Prefer +Inf over NaN for no-return virtual scan bins.
+    invalid_scan_range_is_infinity: true
+    scan_time_sec: 0.033333333

@@ -1,0 +1,7 @@
+uint32 last_cmd_seq
+uint64 esp_cmd_rx_time_us
+uint64 esp_apply_complete_time_us
+uint64 esp_poll_complete_time_us
+uint64 esp_publish_time_us
+float32[6] output_phase_rad
+float32 battery_voltage_v

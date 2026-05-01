@@ -1,0 +1,138 @@
+/**
+ * @file hexapod_hw_config.h
+ * @brief Centralized hardware pin map and motor / tripod definitions.
+ */
+
+#ifndef HEXAPOD_HW_CONFIG_H
+#define HEXAPOD_HW_CONFIG_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "driver/gpio.h"
+#include "driver/i2c_master.h"
+#include "driver/uart.h"
+#include "esp_adc/adc_oneshot.h"
+
+#ifndef CONFIG_SERVO_RS485_UART_TXD
+#define CONFIG_SERVO_RS485_UART_TXD 17
+#endif
+
+#ifndef CONFIG_SERVO_RS485_UART_RXD
+#define CONFIG_SERVO_RS485_UART_RXD 16
+#endif
+
+#ifndef CONFIG_SERVO_RS485_UART_DE_RE
+#define CONFIG_SERVO_RS485_UART_DE_RE 4
+#endif
+
+#ifndef CONFIG_SERVO_ENABLE_GPIO
+#define CONFIG_SERVO_ENABLE_GPIO 27
+#endif
+
+#ifndef CONFIG_SERVO_ENABLE_ACTIVE_LEVEL
+#define CONFIG_SERVO_ENABLE_ACTIVE_LEVEL 0
+#endif
+
+#ifndef CONFIG_POWER_PRECHARGE_SSR_GPIO
+#define CONFIG_POWER_PRECHARGE_SSR_GPIO 19
+#endif
+
+#ifndef CONFIG_POWER_CONTACTOR_SSR_GPIO
+#define CONFIG_POWER_CONTACTOR_SSR_GPIO 18
+#endif
+
+#ifndef CONFIG_POWER_SSR_ACTIVE_LEVEL
+#define CONFIG_POWER_SSR_ACTIVE_LEVEL 1
+#endif
+
+#ifndef CONFIG_POWER_PRECHARGE_SENSE_ADC_GPIO
+#define CONFIG_POWER_PRECHARGE_SENSE_ADC_GPIO 36
+#endif
+
+#ifndef CONFIG_POWER_PRECHARGE_DIVIDER_HIGH_OHMS
+#define CONFIG_POWER_PRECHARGE_DIVIDER_HIGH_OHMS 243000
+#endif
+
+#ifndef CONFIG_POWER_PRECHARGE_DIVIDER_LOW_OHMS
+#define CONFIG_POWER_PRECHARGE_DIVIDER_LOW_OHMS 10000
+#endif
+
+#ifndef CONFIG_POWER_PRECHARGE_COMPLETE_MILLIVOLTS
+#define CONFIG_POWER_PRECHARGE_COMPLETE_MILLIVOLTS 48000
+#endif
+
+/* ---------- Motor numbering / layout ---------- */
+
+#define HEXAPOD_MOTOR_COUNT                  6
+
+#define HEXAPOD_MOTOR_INDEX_LEFT_FRONT       0
+#define HEXAPOD_MOTOR_INDEX_RIGHT_FRONT      1
+#define HEXAPOD_MOTOR_INDEX_RIGHT_MID        2
+#define HEXAPOD_MOTOR_INDEX_LEFT_MID         3
+#define HEXAPOD_MOTOR_INDEX_LEFT_REAR        4
+#define HEXAPOD_MOTOR_INDEX_RIGHT_REAR       5
+
+#define HEXAPOD_TRIPOD_A                     0
+#define HEXAPOD_TRIPOD_B                     1
+
+#define HEXAPOD_MOTOR_SLAVE_ADDRESS_ARRAY    {1, 2, 3, 4, 5, 6}
+#define HEXAPOD_TRIPOD_GROUP_ARRAY           {HEXAPOD_TRIPOD_A, HEXAPOD_TRIPOD_B, HEXAPOD_TRIPOD_A, HEXAPOD_TRIPOD_B, HEXAPOD_TRIPOD_A, HEXAPOD_TRIPOD_B}
+#define HEXAPOD_LOGICAL_DIRECTION_ARRAY      {+1, -1, -1, +1, +1, -1}
+#define HEXAPOD_YAW_COEFFICIENT_ARRAY        {-1, +1, +1, -1, -1, +1}
+
+/* ---------- micro-ROS USB-UART transport ---------- */
+
+#define HEXAPOD_MICROROS_UART_PORT           UART_NUM_0
+#define HEXAPOD_MICROROS_UART_TX_GPIO        GPIO_NUM_1
+#define HEXAPOD_MICROROS_UART_RX_GPIO        GPIO_NUM_3
+
+/* ---------- Shared drive RS485 bus ---------- */
+
+#define HEXAPOD_RS485_UART_PORT              UART_NUM_2
+#define HEXAPOD_RS485_UART_TX_GPIO           CONFIG_SERVO_RS485_UART_TXD
+#define HEXAPOD_RS485_UART_RX_GPIO           CONFIG_SERVO_RS485_UART_RXD
+#define HEXAPOD_RS485_UART_DE_RE_GPIO        CONFIG_SERVO_RS485_UART_DE_RE
+
+#define HEXAPOD_SERVO_ENABLE_GPIO            CONFIG_SERVO_ENABLE_GPIO
+/*
+ * Shared servo-enable relay GPIO / active level are menuconfig-selectable.
+ * Default wiring keeps DI1 low-level-active through an external relay path,
+ * so the default active level remains 0.
+ */
+#define HEXAPOD_SERVO_ENABLE_ACTIVE_LEVEL    CONFIG_SERVO_ENABLE_ACTIVE_LEVEL
+
+/* ---------- IMU wiring ---------- */
+
+#define HEXAPOD_IMU_I2C_PORT                 I2C_NUM_0
+#define HEXAPOD_IMU_I2C_SCL_GPIO             GPIO_NUM_22
+#define HEXAPOD_IMU_I2C_SDA_GPIO             GPIO_NUM_21
+#define HEXAPOD_IMU_INTERRUPT_GPIO           GPIO_NUM_23
+#define HEXAPOD_IMU_I2C_ADDRESS              0x68
+
+/* ---------- Power-path SSR and ADC wiring ---------- */
+
+#define HEXAPOD_PRECHARGE_SSR_GPIO           CONFIG_POWER_PRECHARGE_SSR_GPIO
+#define HEXAPOD_CONTACTOR_SSR_GPIO           CONFIG_POWER_CONTACTOR_SSR_GPIO
+#define HEXAPOD_POWER_SSR_ACTIVE_LEVEL       CONFIG_POWER_SSR_ACTIVE_LEVEL
+#define HEXAPOD_SSR_ACTIVE_LEVEL             CONFIG_POWER_SSR_ACTIVE_LEVEL
+
+#define HEXAPOD_MAIN_BUS_ADC_UNIT            ADC_UNIT_1
+#define HEXAPOD_MAIN_BUS_ADC_CHANNEL         ADC_CHANNEL_0
+#define HEXAPOD_MAIN_BUS_ADC_GPIO            GPIO_NUM_36
+
+#define HEXAPOD_PRECHARGE_SENSE_ADC_GPIO     CONFIG_POWER_PRECHARGE_SENSE_ADC_GPIO
+#define HEXAPOD_PRECHARGE_DIVIDER_HIGH_OHMS  CONFIG_POWER_PRECHARGE_DIVIDER_HIGH_OHMS
+#define HEXAPOD_PRECHARGE_DIVIDER_LOW_OHMS   CONFIG_POWER_PRECHARGE_DIVIDER_LOW_OHMS
+#define HEXAPOD_PRECHARGE_COMPLETE_MILLIVOLTS CONFIG_POWER_PRECHARGE_COMPLETE_MILLIVOLTS
+
+/* ---------- Force sensor ADC wiring ---------- */
+
+#define HEXAPOD_FORCE_SENSOR_GPIO_ARRAY      {36, 39, 34, 35, 32, 33}
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
