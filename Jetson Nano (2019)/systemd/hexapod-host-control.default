@@ -1,0 +1,11 @@
+HEXAPOD_HOST_CONTROL_BIND=127.0.0.1
+HEXAPOD_HOST_CONTROL_PORT=18080
+HEXAPOD_ORBSLAM_SERVICE=orbslam2-realsense.service
+
+# This deployment runs micro-ROS Agent as the docker-compose service/container named microros_agent.
+HEXAPOD_MICROROS_CONTAINERS=microros_agent
+HEXAPOD_MICROROS_DOCKER_COMPOSE_DIR=/home/team2
+HEXAPOD_MICROROS_DOCKER_COMPOSE_SERVICE=microros_agent
+
+# Optional fallback for older host-systemd installs. Leave empty for this docker-compose deployment.
+HEXAPOD_MICROROS_SYSTEMD_SERVICES=

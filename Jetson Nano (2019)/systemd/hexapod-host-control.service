@@ -1,0 +1,14 @@
+[Unit]
+Description=Hexapod host-control helper for operator GUI service/container restart buttons
+After=network-online.target docker.service
+Wants=network-online.target docker.service
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=2
+EnvironmentFile=-/etc/default/hexapod-host-control
+ExecStart=/bin/bash -lc 'exec /usr/local/bin/hexapod-host-control.py --bind "${HEXAPOD_HOST_CONTROL_BIND:-127.0.0.1}" --port "${HEXAPOD_HOST_CONTROL_PORT:-18080}" --orbslam-service "${HEXAPOD_ORBSLAM_SERVICE:-orbslam2-realsense.service}" --microros-containers "${HEXAPOD_MICROROS_CONTAINERS:-microros_agent}" --docker-compose-dir "${HEXAPOD_MICROROS_DOCKER_COMPOSE_DIR:-/home/team2}" --docker-compose-service "${HEXAPOD_MICROROS_DOCKER_COMPOSE_SERVICE:-microros_agent}" --microros-systemd-services "${HEXAPOD_MICROROS_SYSTEMD_SERVICES:-}"'
+
+[Install]
+WantedBy=multi-user.target

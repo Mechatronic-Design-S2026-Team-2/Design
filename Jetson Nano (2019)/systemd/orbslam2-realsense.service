@@ -1,0 +1,52 @@
+[Unit]
+Description=ORB-SLAM2 RealSense (UDP pose + map + virtual scan)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=team2
+WorkingDirectory=/home/team2/ORB-SLAM2-GPU-RGBD
+
+# Fail fast if required artifacts are missing.
+ExecStartPre=/usr/bin/test -x /home/team2/ORB-SLAM2-GPU-RGBD/build/rgbd_real_sense
+ExecStartPre=/usr/bin/test -r /home/team2/ORB-SLAM2-GPU-RGBD/Vocabulary/ORBvoc.txt
+ExecStartPre=/usr/bin/test -r /home/team2/ORB-SLAM2-GPU-RGBD/RealSense_GPU/realsense_d415.yaml
+ExecStartPre=/bin/sleep 2
+
+# Make sure the CUDA-enabled OpenCV you installed is the one used at runtime.
+# Adjust the opencv-cuda lib path if yours differs.
+Environment=LD_LIBRARY_PATH=/usr/local/opencv-cuda/lib:/usr/local/lib:/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu
+
+# UDP outputs for ROS 2 container bridge. This sender uses ORBSLAM_UDP_IP,
+# not ORBSLAM_UDP_HOST. 127.0.0.1 works when the ROS 2 container uses --net=host.
+Environment=ORBSLAM_UDP_ENABLE=1
+Environment=ORBSLAM_UDP_IP=127.0.0.1
+Environment=ORBSLAM_UDP_PORT=5005
+
+# Sparse ORB map point stream for RViz/debug. This is not the occupancy map.
+Environment=ORBSLAM_UDP_MAP_ENABLE=1
+Environment=ORBSLAM_UDP_MAP_PERIOD_FRAMES=30
+Environment=ORBSLAM_UDP_MAP_POINTS_PER_PACKET=120
+Environment=ORBSLAM_UDP_MAP_DECIMATE=2
+
+# Virtual scan generated from the D415 depth image for slam_toolbox /scan input.
+Environment=ORBSLAM_UDP_SCAN_ENABLE=1
+Environment=ORBSLAM_UDP_SCAN_COUNT=240
+Environment=ORBSLAM_UDP_SCAN_BAND_PX=24
+Environment=ORBSLAM_UDP_SCAN_RANGE_MIN=0.45
+Environment=ORBSLAM_UDP_SCAN_RANGE_MAX=3.00
+
+# NOTE: args are: vocab settings use_viz width height fps time_ms.
+# IMPORTANT: time_ms MUST NOT be 0. Use a very large value to "run indefinitely".
+ExecStart=/home/team2/ORB-SLAM2-GPU-RGBD/build/rgbd_real_sense /home/team2/ORB-SLAM2-GPU-RGBD/Vocabulary/ORBvoc.txt /home/team2/ORB-SLAM2-GPU-RGBD/RealSense_GPU/realsense_d415.yaml false 640 480 30 1000000000
+
+# The program traps SIGINT; systemd stop default is SIGTERM.
+KillSignal=SIGINT
+TimeoutStopSec=10
+
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

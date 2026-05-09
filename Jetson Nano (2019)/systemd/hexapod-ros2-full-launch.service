@@ -1,0 +1,21 @@
+[Unit]
+Description=Hexapod full ROS 2 Nav2/operator launch inside ROS 2 container
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+Wants=orbslam2-realsense.service
+After=orbslam2-realsense.service
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=5
+EnvironmentFile=-/etc/default/hexapod-ros2-full-launch
+ExecStart=/usr/local/bin/hexapod-ros2-full-launch.sh
+ExecStop=/bin/bash -lc 'docker exec "${HEXAPOD_CONTAINER_NAME:-jazzy}" bash -lc '\''pkill -INT -f "[r]os2 launch hexapod_nav2_bringup" 2>/dev/null || true; pkill -INT -f "[o]perator_interface_node|[h]exapod_operator_interface" 2>/dev/null || true'\'' || true'
+TimeoutStartSec=90
+TimeoutStopSec=15
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
