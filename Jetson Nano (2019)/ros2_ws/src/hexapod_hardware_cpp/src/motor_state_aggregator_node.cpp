@@ -109,6 +109,7 @@ public:
       declare_parameter<std::vector<double>>(
         "phase_offset_rad", std::vector<double>{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}),
       kDefaultPhaseOffsetRad);
+    anchor_raw_encoder_to_startup_phase_ = declare_parameter<bool>("anchor_raw_encoder_to_startup_phase", true);
     actuation_state_topic_ = declare_parameter<std::string>("actuation_state_topic", "hexapod/actuation_state");
     stale_timeout_s_ = declare_parameter<double>("stale_timeout_s", 0.25);
     phase_rate_from_phase_diff_weight_ = declare_parameter<double>("phase_rate_from_phase_diff_weight", 0.75);
@@ -149,11 +150,12 @@ public:
 
     RCLCPP_INFO(
       get_logger(),
-      "canonical_to_wire_index=[%zu,%zu,%zu,%zu,%zu,%zu], physical_to_model_phase_sign=[%.1f,%.1f,%.1f,%.1f,%.1f,%.1f]",
+      "canonical_to_wire_index=[%zu,%zu,%zu,%zu,%zu,%zu], physical_to_model_phase_sign=[%.1f,%.1f,%.1f,%.1f,%.1f,%.1f], anchor_raw_encoder_to_startup_phase=%s",
       canonical_to_wire_index_[0], canonical_to_wire_index_[1], canonical_to_wire_index_[2],
       canonical_to_wire_index_[3], canonical_to_wire_index_[4], canonical_to_wire_index_[5],
       physical_to_model_phase_sign_[0], physical_to_model_phase_sign_[1], physical_to_model_phase_sign_[2],
-      physical_to_model_phase_sign_[3], physical_to_model_phase_sign_[4], physical_to_model_phase_sign_[5]);
+      physical_to_model_phase_sign_[3], physical_to_model_phase_sign_[4], physical_to_model_phase_sign_[5],
+      anchor_raw_encoder_to_startup_phase_ ? "true" : "false");
 
     timer_ = create_wall_timer(std::chrono::milliseconds(20), std::bind(&MotorStateAggregatorNode::publish_combined, this));
   }
@@ -163,6 +165,7 @@ private:
   {
     double previous_output_phase_rad{0.0};
     double previous_raw_encoder_count_mod{0.0};
+    double startup_raw_encoder_count_mod{0.0};
     double continuous_motor_counts_est{0.0};
     uint64_t previous_poll_complete_time_us{0};
     double last_estimated_phase_rate_rad_s{0.0};
@@ -334,7 +337,8 @@ private:
     }
 
     if (!state.initialized) {
-      state.continuous_motor_counts_est = raw_count;
+      state.startup_raw_encoder_count_mod = raw_count;
+      state.continuous_motor_counts_est = anchor_raw_encoder_to_startup_phase_ ? 0.0 : raw_count;
       state.previous_raw_encoder_count_mod = raw_count;
       state.previous_output_phase_rad =
         model_phase_sign * state.continuous_motor_counts_est * output_phase_per_motor_count + model_phase_offset;
@@ -375,12 +379,14 @@ private:
 
     state.continuous_motor_counts_est = predicted_motor_counts;
     if (use_raw_encoder_measurement) {
-      const double nearest_turns = std::round((predicted_motor_counts - raw_count) / counts_per_rev);
-      double measured_motor_counts = raw_count + counts_per_rev * nearest_turns;
+      const double raw_measurement_base_count = anchor_raw_encoder_to_startup_phase_ ?
+        shortest_modulo_count_delta(raw_count, state.startup_raw_encoder_count_mod, counts_per_rev) : raw_count;
+      const double nearest_turns = std::round((predicted_motor_counts - raw_measurement_base_count) / counts_per_rev);
+      double measured_motor_counts = raw_measurement_base_count + counts_per_rev * nearest_turns;
 
       if (std::abs(phase_rate_from_command) < near_zero_command_phase_rate_rad_s_) {
-        const double prev_turns = std::round((state.continuous_motor_counts_est - raw_count) / counts_per_rev);
-        measured_motor_counts = raw_count + counts_per_rev * prev_turns;
+        const double prev_turns = std::round((state.continuous_motor_counts_est - raw_measurement_base_count) / counts_per_rev);
+        measured_motor_counts = raw_measurement_base_count + counts_per_rev * prev_turns;
       }
 
       const double innovation_turn_limit = std::max(0.05, phase_prediction_innovation_limit_turns_);
@@ -560,6 +566,7 @@ private:
   std::array<std::size_t, 6> wire_to_canonical_index_{kDefaultWireToCanonicalIndex};
   std::array<double, 6> physical_to_model_phase_sign_{kDefaultPhysicalToModelPhaseSign};
   std::array<double, 6> phase_offset_rad_{kDefaultPhaseOffsetRad};
+  bool anchor_raw_encoder_to_startup_phase_{true};
   std::string actuation_state_topic_;
   bool subscribe_direct_rpm_commands_{true};
   bool hold_last_direct_rpm_command_{true};

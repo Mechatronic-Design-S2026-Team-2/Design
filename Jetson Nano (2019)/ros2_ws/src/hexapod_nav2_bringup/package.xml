@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>hexapod_nav2_bringup</name>
+  <version>0.1.0</version>
+  <description>Nav2 bringup configuration for the hexapod tripod gait controller using ORB-SLAM virtual LaserScan and slam_toolbox.</description>
+  <maintainer email="user@example.com">hexapod</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>nav2_bt_navigator</exec_depend>
+  <exec_depend>nav2_controller</exec_depend>
+  <exec_depend>nav2_planner</exec_depend>
+  <exec_depend>nav2_behaviors</exec_depend>
+  <exec_depend>nav2_waypoint_follower</exec_depend>
+  <exec_depend>nav2_smoother</exec_depend>
+  <exec_depend>nav2_velocity_smoother</exec_depend>
+  <exec_depend>nav2_lifecycle_manager</exec_depend>
+  <exec_depend>nav2_navfn_planner</exec_depend>
+  <exec_depend>nav2_regulated_pure_pursuit_controller</exec_depend>
+  <exec_depend>nav2_costmap_2d</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>hexapod_tripod_gait</exec_depend>
+  <exec_depend>hexapod_hardware_cpp</exec_depend>
+  <exec_depend>hexapod_orbslam_udp_bridge</exec_depend>
+  <exec_depend>hexapod_operator_interface</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

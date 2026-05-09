@@ -26,7 +26,8 @@ public:
     double turn_phase_bias_gain,
     double minimum_speed_scale,
     double wave_turn_threshold_rps,
-    double in_place_turn_threshold_rps);
+    double in_place_turn_threshold_rps,
+    double forward_phase_rate_sign);
 
   GaitCommand make_command(
     const std::array<double, 6> & current_phase_rad,
@@ -47,6 +48,7 @@ private:
   double minimum_speed_scale_{0.2};
   double wave_turn_threshold_rps_{0.35};
   double in_place_turn_threshold_rps_{0.10};
+  double forward_phase_rate_sign_{-1.0};
 };
 
 }  // namespace hexapod_nav_cpp

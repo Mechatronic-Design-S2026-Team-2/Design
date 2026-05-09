@@ -21,6 +21,22 @@ wt901_imu_node:
     angular_velocity_covariance_diag: [0.01, 0.01, 0.02]
     linear_acceleration_covariance_diag: [0.1, 0.1, 0.15]
 
+imu_udp_export_node:
+  ros__parameters:
+    enabled: true
+    input_topic: /imu/data_raw
+    # If the ORB-SLAM3 process runs on the Jetson host and the ROS 2 container
+    # uses --network host, 127.0.0.1 reaches the host process. If the container
+    # is bridged, set this to the Jetson host LAN IP visible from the container.
+    target_ip: 127.0.0.1
+    target_port: 5015
+    use_header_stamp: true
+    include_frame_id: true
+    include_orientation: true
+    # 0.0 forwards every IMU sample. Increase to rate-limit, e.g. 0.005 for 200 Hz.
+    min_publish_period_s: 0.0
+    print_every_n_packets: 250
+
 motor_state_aggregator_node:
   ros__parameters:
     input_topic: /motor_output_odom
@@ -37,7 +53,13 @@ motor_state_aggregator_node:
     # Canonical order [rf, rm, rb, lf, lm, lb]. These signs convert physical
     # motor encoder/RPM direction into the linkage model's positive phase.
     physical_to_model_phase_sign: [-1.0, -1.0, -1.0, 1.0, 1.0, 1.0]
+    # The ESP32 publishes raw single-turn motor encoder counts, not absolute
+    # gearbox-output phase. At boot/launch, all cranks are physically indexed
+    # downward, so the first raw count for each leg becomes that leg's model
+    # zero reference. phase_offset_rad is therefore the model phase of the
+    # downward crank pose, not a correction for raw encoder count spread.
     phase_offset_rad: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    anchor_raw_encoder_to_startup_phase: true
     hold_last_direct_rpm_command: true
     direct_rpm_command_timeout_s: 1.0
     actuation_state_topic: hexapod/actuation_state
@@ -95,7 +117,7 @@ phase_command_router_node:
     measurement_age_gain: 1.0
     future_apply_delay_gain: 1.0
     publish_only_on_change: true
-    max_publish_rate_hz: 50.0
+    max_publish_rate_hz: 10.0
     publish_actuation_state_only_on_command: true
 
 body_state_estimator_node:
@@ -116,10 +138,11 @@ body_state_estimator_node:
     body_heading_offset_rad: 0.0
     imu_yaw_alpha: 0.0
     imu_yaw_rate_alpha: 0.45
-    # Match the kinematic estimator to the same X mirroring used by the Klann visualizer.
-    # Current straight-line calibration: 73 in physical / 0.8511 m raw kinematic = 2.1786.
+    # Keep the kinematic estimator mirrored to match the Klann visualizer, but
+    # leave linear scale uncorrected until the raw-encoder startup anchor has
+    # been validated with a new measured straight-line test.
     body_velocity_scale: 1.0
-    body_twist_axis_scale: [2.1786, 2.1786, 1.0]
+    body_twist_axis_scale: [1.0, 1.0, 1.0]
     mirror_kinematics_across_y_axis: true
     phase_velocity_scale: 1.0
     use_measurement_delay_compensation: true
@@ -128,8 +151,19 @@ body_state_estimator_node:
 
 lcd1602_status_node:
   ros__parameters:
+    enabled: true
     i2c_device: /dev/i2c-1
     i2c_address: 39
+    operator_url: "http://192.168.50.1:8080/"
+    startup_line: "Hexapod GUI"
+    status_json_topic: "/hexapod/operator/status_json"
+    battery_topic: "/hexapod/operator/battery_voltage"
+    body_state_topic: "hexapod/body_state"
+    plan_topic: "plan"
+    selected_cmd_topic: "/hexapod/cmd_vel_selected"
+    page_period_sec: 3.0
+    refresh_period_ms: 750
+    reconnect_period_sec: 5.0
 
 weighted_odom_fusion_node:
   ros__parameters:

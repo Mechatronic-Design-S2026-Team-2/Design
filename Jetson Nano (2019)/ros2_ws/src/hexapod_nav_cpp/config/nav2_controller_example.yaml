@@ -36,6 +36,8 @@ controller_server:
       minimum_speed_scale: 0.2
       wave_turn_threshold_rps: 0.35
       in_place_turn_threshold_rps: 0.10
+      forward_phase_rate_sign: -1.0
+      mirror_kinematics_across_y_axis: true
       motor_ids: [3, 2, 1, 4, 5, 6]  # [right_front, right_middle, right_back, left_front, left_middle, left_back]
       body_bbox_min_x_m: -0.32779819
       body_bbox_max_x_m: 0.42910181

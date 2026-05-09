@@ -152,7 +152,9 @@ void KlannControllerCore::set_parameters(
   double turn_phase_bias_gain,
   double minimum_speed_scale,
   double wave_turn_threshold_rps,
-  double in_place_turn_threshold_rps)
+  double in_place_turn_threshold_rps,
+  double forward_phase_rate_sign,
+  bool mirror_kinematics_across_y_axis)
 {
   horizon_dt_s_ = horizon_dt_s;
   horizon_steps_ = horizon_steps;
@@ -179,12 +181,15 @@ void KlannControllerCore::set_parameters(
   roll_tracking_weight_ = roll_tracking_weight;
   pitch_tracking_weight_ = pitch_tracking_weight;
   phase_rate_limit_rad_s_ = phase_rate_limit_rad_s;
+  forward_phase_rate_sign_ = forward_phase_rate_sign >= 0.0 ? 1.0 : -1.0;
+  mirror_kinematics_across_y_axis_ = mirror_kinematics_across_y_axis;
   gait_.set_parameters(
     phase_sync_gain,
     turn_phase_bias_gain,
     minimum_speed_scale,
     wave_turn_threshold_rps,
-    in_place_turn_threshold_rps);
+    in_place_turn_threshold_rps,
+    forward_phase_rate_sign_);
   ensure_nominal_sequences();
 }
 
@@ -240,6 +245,10 @@ KlannControllerCore::PredictedLegState KlannControllerCore::predict_leg_state(
       const auto kin = lookup_solver_.evaluate(lookup_models_[i], phases[i], phase_rates[i], horizon_dt_s_);
       predicted.foot_xy[i] = kin.foot_body_xy;
       predicted.foot_vel_xy[i] = kin.foot_velocity_body_xy;
+      if (mirror_kinematics_across_y_axis_) {
+        predicted.foot_xy[i].x() = -predicted.foot_xy[i].x();
+        predicted.foot_vel_xy[i].x() = -predicted.foot_vel_xy[i].x();
+      }
       predicted.foot_z[i] = kin.foot_body_z;
       predicted.stance[i] = kin.stance_confidence;
     } else {
@@ -574,7 +583,7 @@ ControllerResult KlannControllerCore::compute(
   result.phase_cmd.gait_mode = best.first_gait_mode;
   for (std::size_t i = 0; i < 6; ++i) {
     const double phase_rate = clamp(best.phase_rates.front()[i], -phase_rate_limit_rad_s_, phase_rate_limit_rad_s_);
-    result.phase_cmd.phase_target_rad[i] = static_cast<float>(PhaseGaitGenerator::wrap_2pi(body_state.phase_rad[i] + phase_rate * horizon_dt_s_));
+    result.phase_cmd.phase_target_rad[i] = static_cast<float>(PhaseGaitGenerator::wrap_pi(body_state.phase_rad[i] + phase_rate * horizon_dt_s_));
     result.phase_cmd.phase_velocity_rad_s[i] = static_cast<float>(phase_rate);
     result.phase_cmd.motor_rpm_ff[i] = 0.0f;
   }

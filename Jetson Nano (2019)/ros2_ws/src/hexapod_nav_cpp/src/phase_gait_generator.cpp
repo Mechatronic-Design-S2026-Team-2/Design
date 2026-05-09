@@ -13,13 +13,15 @@ void PhaseGaitGenerator::set_parameters(
   double turn_phase_bias_gain,
   double minimum_speed_scale,
   double wave_turn_threshold_rps,
-  double in_place_turn_threshold_rps)
+  double in_place_turn_threshold_rps,
+  double forward_phase_rate_sign)
 {
   phase_sync_gain_ = phase_sync_gain;
   turn_phase_bias_gain_ = turn_phase_bias_gain;
   minimum_speed_scale_ = minimum_speed_scale;
   wave_turn_threshold_rps_ = wave_turn_threshold_rps;
   in_place_turn_threshold_rps_ = in_place_turn_threshold_rps;
+  forward_phase_rate_sign_ = forward_phase_rate_sign >= 0.0 ? 1.0 : -1.0;
 }
 
 double PhaseGaitGenerator::wrap_2pi(double angle_rad)
@@ -73,7 +75,7 @@ GaitCommand PhaseGaitGenerator::make_command(
   out.desired_phase_offset_rad = offsets;
   const std::array<int, 6> side_sign = {-1, -1, -1, +1, +1, +1};
   const double speed_scale = std::max(minimum_speed_scale_, std::min(1.0, std::abs(desired_vx_mps) + 0.6 * std::abs(desired_wz_rps)));
-  const double direction = desired_vx_mps < 0.0 ? -1.0 : 1.0;
+  const double direction = (desired_vx_mps < 0.0 ? -1.0 : 1.0) * forward_phase_rate_sign_;
 
   double phase_anchor = 0.0;
   for (std::size_t i = 0; i < 6; ++i) {
@@ -92,7 +94,7 @@ GaitCommand PhaseGaitGenerator::make_command(
     const double sync_error = wrap_pi(desired_phase - current_phase_rad[i]);
     phase_rate += phase_sync_gain_ * sync_error;
     out.phase_velocity_rad_s[i] = phase_rate;
-    out.phase_target_rad[i] = wrap_2pi(current_phase_rad[i] + phase_rate * dt_s);
+    out.phase_target_rad[i] = wrap_pi(current_phase_rad[i] + phase_rate * dt_s);
     out.stance_confidence[i] = smooth_stance_confidence(out.phase_target_rad[i]);
   }
 

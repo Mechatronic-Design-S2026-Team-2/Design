@@ -1,0 +1,138 @@
+hexapod_tripod_gait:
+  ros__parameters:
+    # Input teleop topics. Leave either one empty to disable that subscriber.
+    cmd_vel_topic: "/hexapod/cmd_vel_selected"
+    cmd_vel_stamped_topic: ""
+
+    # Output topics.
+    # command_output_mode:
+    #   "rpm"   -> publish dsy_motor_msgs/MotorRpmArray directly to the ESP bridge.
+    #   "phase" -> publish hexapod_control_interfaces/LegPhaseCommand to
+    #              phase_command_router_node. This is preferred when the
+    #              hardware stack is running because it keeps canonical
+    #              model-phase units and lets the router own physical motor signs.
+    command_output_mode: "rpm"
+    rpm_command_topic: "motor_rpm_cmd"
+    phase_command_topic: "hexapod/phase_cmd"
+
+    # Feedback topics.
+    # New raw-encoder ESP firmware reuses motor_output_odom.output_phase_rad[]
+    # for raw single-turn encoder counts. Do not use that compact topic directly
+    # for tripod phase tracking unless the ESP is publishing actual phase.
+    # The hardware motor_state_aggregator_node converts raw encoder counts into
+    # canonical [RF, RM, RB, LF, LM, LB] phase_rad[] values.
+    odometry_topic: "motor_output_odom"
+    motor_state_topic: "/hexapod/motor_state"
+    use_motor_state_feedback: true
+    use_compact_odometry_feedback: false
+    motor_state_require_comm_ok: false
+    motor_state_require_fresh: false
+
+    # Optional feedback topics.
+    # imu_topic expects sensor_msgs/msg/Imu.
+    # euler_topic expects geometry_msgs/msg/Vector3Stamped with x=roll, y=pitch, z=yaw.
+    # euler_vector_topic expects geometry_msgs/msg/Vector3 with x=roll, y=pitch, z=yaw.
+    imu_topic: "imu/data_raw"
+    euler_topic: "imu/euler"
+    euler_vector_topic: ""
+
+    # Keep this <= 10.0; the node also clamps it to 10 Hz internally.
+    publish_rate_hz: 10.0
+
+    # Motor RPM scaling. These are intentionally conservative starting values.
+    linear_rpm_per_mps: 1200.0
+    yaw_rpm_per_radps: 600.0
+    max_motor_rpm: 1500.0
+    rpm_rate_limit_per_sec: 0.0
+    gear_ratio: 50.0
+
+    # In phase output mode, these populate LegPhaseCommand. Use phase velocity
+    # by default; do not enable both unless you deliberately want feed-forward
+    # terms to add inside phase_command_router_node.
+    phase_command_use_phase_velocity: true
+    phase_command_use_motor_rpm_ff: false
+
+    # Command freshness/deadband.
+    # latch_last_teleop_command=true means one received teleop command remains active
+    # until another teleop command arrives. Send an explicit zero Twist to stop.
+    latch_last_teleop_command: true
+    command_timeout_sec: 0.30
+    odometry_timeout_sec: 0.50
+    imu_timeout_sec: 0.35
+    euler_timeout_sec: 0.35
+    linear_deadband_mps: 0.01
+    angular_deadband_radps: 0.01
+
+    # Arrays are ordered [right_back, right_middle, right_front, left_front, left_middle, left_back].
+    # Confirmed forward command sign convention:
+    #   right legs positive RPM, left legs negative RPM.
+    forward_motor_signs: [1.0, 1.0, 1.0, -1.0, -1.0, -1.0]
+
+    # Feedback phase signs. With /hexapod/motor_state these remain all +1 because
+    # motor_state_aggregator_node already converts raw encoder counts into model phase.
+    phase_direction_signs: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+
+    # Physical motor sign needed to create positive model phase correction.
+    # Internal order is [RB, RM, RF, LF, LM, LB].
+    phase_correction_motor_signs: [-1.0, -1.0, -1.0, 1.0, 1.0, 1.0]
+    phase_offsets_rad: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+    # Mapping between this teleop node's internal order [RB, RM, RF, LF, LM, LB]
+    # and the hardware package's canonical order [RF, RM, RB, LF, LM, LB].
+    internal_to_motor_state_index: [2, 1, 0, 3, 4, 5]
+    internal_to_phase_command_index: [2, 1, 0, 3, 4, 5]
+
+    # Canonical [RF, RM, RB, LF, LM, LB]. Must match
+    # phase_command_router_node.model_to_physical_motor_sign.
+    model_to_physical_motor_signs: [-1.0, -1.0, -1.0, 1.0, 1.0, 1.0]
+
+    # Logical yaw side signs are in body forward-speed space before physical motor sign mapping.
+    # Positive angular.z makes the right side walk forward and the left side walk backward.
+    yaw_side_signs: [1.0, 1.0, 1.0, -1.0, -1.0, -1.0]
+
+    # Phase lock keeps tripod A [RM, LF, LB] and tripod B [RB, RF, LM] separated by pi radians.
+    phase_lock_enabled: true
+    phase_kp_rpm_per_rad: 25.0
+    max_phase_correction_rpm: 100.0
+    phase_lock_min_linear_rpm: 10.0
+    phase_lock_during_pure_turn: false
+    require_odometry_for_motion: false
+
+    # Feedback master switches.
+    # imu_feedback_enabled controls raw IMU subscription and raw IMU feedback terms.
+    # euler_feedback_enabled controls the explicit Euler topic subscription.
+    imu_feedback_enabled: true
+    euler_feedback_enabled: true
+
+    # Raw IMU yaw-rate feedback. Gain defaults to zero so first bringup stays open-loop.
+    # Raise it gradually, e.g. 0.1 -> 0.2 -> 0.5, after confirming IMU yaw-rate sign.
+    yaw_rate_feedback_enabled: true
+    yaw_rate_feedback_kp: 0.0
+    max_yaw_rate_correction_radps: 0.35
+
+    # Raw IMU acceleration feedback.
+    # This integrates selected linear_acceleration axis into a leaky velocity estimate, then
+    # compares estimated forward velocity against cmd_vel.linear.x. It is disabled by default
+    # because raw accelerometer integration drifts unless the IMU axes/sign/bias are verified.
+    linear_accel_feedback_enabled: false
+    linear_velocity_feedback_kp: 0.0
+    max_linear_velocity_correction_mps: 0.20
+    linear_accel_axis: 0       # 0=x, 1=y, 2=z. Use x if the IMU x-axis points robot-forward.
+    linear_accel_sign: 1.0
+    accel_deadband_mps2: 0.10
+    accel_velocity_leak_tau_sec: 1.50
+    max_estimated_linear_velocity_mps: 1.00
+
+    # Euler/tilt feedback. Angles are radians unless euler_angles_are_degrees=true.
+    euler_angles_are_degrees: false
+    euler_axis_signs: [1.0, 1.0, 1.0]
+    use_raw_imu_orientation: true
+    tilt_safety_enabled: true
+    roll_soft_limit_rad: 0.35
+    roll_hard_limit_rad: 0.70
+    pitch_soft_limit_rad: 0.35
+    pitch_hard_limit_rad: 0.70
+
+    # False publishes only when the quantized six-RPM vector changes.
+    # Set true only if you intentionally want a 10 Hz keepalive stream.
+    publish_unchanged_commands: false

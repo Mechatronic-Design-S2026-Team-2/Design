@@ -65,7 +65,9 @@ void Nav2KlannController::configure(
     node->declare_parameter<double>(name_ + ".turn_phase_bias_gain", 0.8),
     node->declare_parameter<double>(name_ + ".minimum_speed_scale", 0.2),
     node->declare_parameter<double>(name_ + ".wave_turn_threshold_rps", 0.35),
-    node->declare_parameter<double>(name_ + ".in_place_turn_threshold_rps", 0.10));
+    node->declare_parameter<double>(name_ + ".in_place_turn_threshold_rps", 0.10),
+    node->declare_parameter<double>(name_ + ".forward_phase_rate_sign", -1.0),
+    node->declare_parameter<bool>(name_ + ".mirror_kinematics_across_y_axis", true));
 
   auto motor_ids = node->declare_parameter<std::vector<int64_t>>(name_ + ".motor_ids", std::vector<int64_t>{3, 2, 1, 4, 5, 6});
   for (std::size_t i = 0; i < 6 && i < motor_ids.size(); ++i) {

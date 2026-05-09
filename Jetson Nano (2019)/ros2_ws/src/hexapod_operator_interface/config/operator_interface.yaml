@@ -1,0 +1,50 @@
+hexapod_operator_interface:
+  ros__parameters:
+    bind_address: "0.0.0.0"
+    http_port: 8080
+
+    selected_cmd_vel_topic: "/hexapod/cmd_vel_selected"
+    nav_cmd_vel_topic: "/cmd_vel_nav"
+    map_topic: "/map"
+    global_costmap_topic: "/global_costmap/costmap"
+    local_costmap_topic: "/local_costmap/costmap"
+    map_fallback_to_costmaps: true
+    odom_topic: "/odom"
+    compact_odom_topic: "/motor_output_odom"
+    motor_state_topic: "/hexapod/motor_state"
+
+    publish_rate_hz: 20.0
+    teleop_timeout_sec: 0.35
+    latch_teleop_commands: true
+    nav_cmd_timeout_sec: 0.50
+    estop_publish_zero_hz: 20.0
+
+    keyboard_linear_mps: 0.50
+    keyboard_angular_radps: 0.50
+    keyboard_fast_scale: 1.6
+    keyboard_slow_scale: 0.5
+
+    max_linear_mps: 3.00
+    max_angular_radps: 3.00
+
+    waypoint_max_linear_mps: 0.50
+    waypoint_max_angular_radps: 0.50
+
+    robot_body_length_m: 0.76
+    robot_body_width_m: 1.10
+    robot_stride_visual_m: 0.18
+    robot_leg_lateral_visual_m: 0.18
+
+    map_storage_dir: "/ros2_ws/maps"
+    loaded_map_topic: "/hexapod/operator/loaded_map"
+    map_occupied_thresh: 0.65
+    map_free_thresh: 0.25
+
+    default_mode: "estop"
+    publish_status_json: true
+
+    host_control_base_url: "http://127.0.0.1:18080"
+    host_control_timeout_sec: 8.0
+    pause_mapping_service: "/slam_toolbox/pause_new_measurements"
+    resume_mapping_service: "/slam_toolbox/resume_new_measurements"
+    mapping_updates_enabled_default: true

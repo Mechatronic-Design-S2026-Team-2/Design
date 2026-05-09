@@ -52,7 +52,7 @@
 
     # Stamp the scan with the last pose stamp to avoid TF extrapolation failures
     # in slam_toolbox when scan packets arrive milliseconds after pose packets.
-    stamp_scan_with_latest_pose: true
+    stamp_scan_with_latest_pose: false
 
     # Prefer +Inf over NaN for no-return virtual scan bins.
     invalid_scan_range_is_infinity: true

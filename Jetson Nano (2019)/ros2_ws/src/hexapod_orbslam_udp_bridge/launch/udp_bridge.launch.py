@@ -15,7 +15,7 @@ def generate_launch_description():
         DeclareLaunchArgument('base_frame', default_value='base_link'),
         DeclareLaunchArgument('odom_topic', default_value='/hexapod/orbslam_odom'),
 
-        DeclareLaunchArgument('scan_topic', default_value='/scan'),
+        DeclareLaunchArgument('scan_topic', default_value='/scan_raw'),
         DeclareLaunchArgument('scan_frame', default_value='orbslam_scan_frame'),
         DeclareLaunchArgument('map_topic', default_value='/orbslam/map_points'),
         DeclareLaunchArgument('map_frame', default_value='map'),
@@ -56,7 +56,7 @@ def generate_launch_description():
         DeclareLaunchArgument('scan_pitch', default_value='0.0'),
         DeclareLaunchArgument('scan_yaw', default_value='0.0'),
 
-        DeclareLaunchArgument('stamp_scan_with_latest_pose', default_value='true'),
+        DeclareLaunchArgument('stamp_scan_with_latest_pose', default_value='false'),
         DeclareLaunchArgument('convert_scan_optical_to_ros', default_value='true'),
         DeclareLaunchArgument('invalid_scan_range_is_infinity', default_value='true'),
         DeclareLaunchArgument('scan_time_sec', default_value='0.033333333'),

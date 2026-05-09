@@ -33,6 +33,12 @@ klann_mppi_controller_node:
     minimum_speed_scale: 0.2
     wave_turn_threshold_rps: 0.35
     in_place_turn_threshold_rps: 0.10
+    # Positive path +x must use the phase direction that maps through the
+    # phase router to physical forward: right motors positive, left motors negative.
+    forward_phase_rate_sign: -1.0
+    # Match the hardware body estimator and RViz linkage convention. Without this,
+    # MPPI rollouts predict the opposite x direction from the real robot/model.
+    mirror_kinematics_across_y_axis: true
     body_bbox_min_x_m: -0.32779819
     body_bbox_max_x_m: 0.42910181
     body_bbox_min_y_m: -0.54833701

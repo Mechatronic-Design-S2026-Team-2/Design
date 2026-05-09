@@ -59,7 +59,9 @@ public:
     double turn_phase_bias_gain,
     double minimum_speed_scale,
     double wave_turn_threshold_rps,
-    double in_place_turn_threshold_rps);
+    double in_place_turn_threshold_rps,
+    double forward_phase_rate_sign,
+    bool mirror_kinematics_across_y_axis);
 
   bool initialize_lookup_models(const std::string & linkage_yaml_path);
 
@@ -132,6 +134,8 @@ private:
   double roll_tracking_weight_{0.5};
   double pitch_tracking_weight_{0.5};
   double phase_rate_limit_rad_s_{8.0};
+  double forward_phase_rate_sign_{-1.0};
+  bool mirror_kinematics_across_y_axis_{true};
 
   std::vector<double> nominal_vx_sequence_;
   std::vector<double> nominal_wz_sequence_;

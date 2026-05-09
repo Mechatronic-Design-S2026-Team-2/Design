@@ -53,7 +53,9 @@ public:
       declare_parameter<double>("turn_phase_bias_gain", 0.8),
       declare_parameter<double>("minimum_speed_scale", 0.2),
       declare_parameter<double>("wave_turn_threshold_rps", 0.35),
-      declare_parameter<double>("in_place_turn_threshold_rps", 0.10));
+      declare_parameter<double>("in_place_turn_threshold_rps", 0.10),
+      declare_parameter<double>("forward_phase_rate_sign", -1.0),
+      declare_parameter<bool>("mirror_kinematics_across_y_axis", true));
 
     body_sub_ = create_subscription<hexapod_control_interfaces::msg::KlannBodyState>(
       "hexapod/body_state", 10, std::bind(&KlannMppiControllerNode::on_body, this, std::placeholders::_1));

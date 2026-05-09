@@ -42,6 +42,9 @@ add_executable(wt901_imu_node src/wt901_imu_node.cpp)
 target_link_libraries(wt901_imu_node ${PROJECT_NAME}_core)
 ament_target_dependencies(wt901_imu_node rclcpp sensor_msgs geometry_msgs std_msgs)
 
+add_executable(imu_udp_export_node src/imu_udp_export_node.cpp)
+ament_target_dependencies(imu_udp_export_node rclcpp sensor_msgs)
+
 add_executable(motor_state_aggregator_node src/motor_state_aggregator_node.cpp)
 target_link_libraries(motor_state_aggregator_node ${PROJECT_NAME}_core)
 ament_target_dependencies(motor_state_aggregator_node rclcpp dsy_motor_msgs hexapod_control_interfaces)
@@ -63,7 +66,7 @@ ament_target_dependencies(body_state_estimator_node rclcpp sensor_msgs geometry_
 
 add_executable(lcd1602_status_node src/lcd1602_status_node.cpp)
 target_link_libraries(lcd1602_status_node ${PROJECT_NAME}_core)
-ament_target_dependencies(lcd1602_status_node rclcpp nav_msgs hexapod_control_interfaces)
+ament_target_dependencies(lcd1602_status_node rclcpp geometry_msgs nav_msgs std_msgs hexapod_control_interfaces)
 
 
 add_executable(klann_visualizer_node src/klann_visualizer_node.cpp)
@@ -88,6 +91,7 @@ install(TARGETS
 
 install(TARGETS
   wt901_imu_node
+  imu_udp_export_node
   motor_state_aggregator_node
   phase_command_router_node
   body_state_estimator_node
