@@ -52,7 +52,7 @@ private:
   hexapod_control_interfaces::msg::KlannBodyState::SharedPtr latest_body_state_;
   std::string name_;
   std::array<uint8_t, 6> motor_ids_{1, 2, 3, 4, 5, 6};
-  double linear_speed_limit_mps_{0.25};
+  double linear_speed_limit_mps_{0.03};
 };
 
 }  // namespace hexapod_nav_cpp

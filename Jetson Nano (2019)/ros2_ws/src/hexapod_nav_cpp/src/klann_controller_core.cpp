@@ -62,6 +62,17 @@ double KlannControllerCore::nearest_path_error(const nav_msgs::msg::Path & plan,
   return std::sqrt(best_d2);
 }
 
+double KlannControllerCore::final_goal_distance(const nav_msgs::msg::Path & plan, double x, double y)
+{
+  if (plan.poses.empty()) {
+    return 0.0;
+  }
+  const auto & goal = plan.poses.back().pose.position;
+  const double dx = goal.x - x;
+  const double dy = goal.y - y;
+  return std::sqrt(dx * dx + dy * dy);
+}
+
 double KlannControllerCore::support_margin_from_points(
   const std::array<Eigen::Vector2d, 6> & feet,
   const std::array<double, 6> & stance)
@@ -154,7 +165,13 @@ void KlannControllerCore::set_parameters(
   double wave_turn_threshold_rps,
   double in_place_turn_threshold_rps,
   double forward_phase_rate_sign,
-  bool mirror_kinematics_across_y_axis)
+  bool mirror_kinematics_across_y_axis,
+  double goal_tolerance_m,
+  bool lock_forward_phase_rate_sign,
+  double forward_lock_vx_threshold_mps,
+  double forward_lock_wz_threshold_rps,
+  double min_locked_phase_rate_rad_s,
+  int random_seed)
 {
   horizon_dt_s_ = horizon_dt_s;
   horizon_steps_ = horizon_steps;
@@ -180,9 +197,15 @@ void KlannControllerCore::set_parameters(
   pitch_weight_ = pitch_weight;
   roll_tracking_weight_ = roll_tracking_weight;
   pitch_tracking_weight_ = pitch_tracking_weight;
-  phase_rate_limit_rad_s_ = phase_rate_limit_rad_s;
+  phase_rate_limit_rad_s_ = std::max(0.02, phase_rate_limit_rad_s);
   forward_phase_rate_sign_ = forward_phase_rate_sign >= 0.0 ? 1.0 : -1.0;
   mirror_kinematics_across_y_axis_ = mirror_kinematics_across_y_axis;
+  goal_tolerance_m_ = std::max(0.0, goal_tolerance_m);
+  lock_forward_phase_rate_sign_ = lock_forward_phase_rate_sign;
+  forward_lock_vx_threshold_mps_ = std::max(0.0, forward_lock_vx_threshold_mps);
+  forward_lock_wz_threshold_rps_ = std::max(0.0, forward_lock_wz_threshold_rps);
+  min_locked_phase_rate_rad_s_ = std::max(0.0, min_locked_phase_rate_rad_s);
+  rng_.seed(static_cast<std::mt19937::result_type>(std::max(0, random_seed)));
   gait_.set_parameters(
     phase_sync_gain,
     turn_phase_bias_gain,
@@ -232,6 +255,28 @@ void KlannControllerCore::warm_start_sequences(double nominal_vx, double nominal
   std::rotate(nominal_phase_rate_sequence_.begin(), nominal_phase_rate_sequence_.begin() + 1, nominal_phase_rate_sequence_.end());
   nominal_vx_sequence_.back() = nominal_vx;
   nominal_wz_sequence_.back() = nominal_wz;
+}
+
+void KlannControllerCore::enforce_phase_rate_constraints(
+  PhaseRateStep & step, double nominal_vx, double nominal_wz) const
+{
+  if (!lock_forward_phase_rate_sign_) {
+    return;
+  }
+  if (std::abs(nominal_vx) < forward_lock_vx_threshold_mps_ ||
+      std::abs(nominal_wz) > forward_lock_wz_threshold_rps_) {
+    return;
+  }
+
+  const double desired_sign = (nominal_vx >= 0.0 ? 1.0 : -1.0) * forward_phase_rate_sign_;
+  for (auto & rate : step) {
+    double mag = std::abs(rate);
+    if (mag < min_locked_phase_rate_rad_s_) {
+      mag = min_locked_phase_rate_rad_s_;
+    }
+    mag = clamp(mag, 0.0, phase_rate_limit_rad_s_);
+    rate = desired_sign * mag;
+  }
 }
 
 KlannControllerCore::PredictedLegState KlannControllerCore::predict_leg_state(
@@ -341,6 +386,12 @@ std::vector<KlannControllerCore::PhaseRateStep> KlannControllerCore::build_base_
     }
     for (std::size_t i = 0; i < 6; ++i) {
       base[static_cast<std::size_t>(k)][i] = clamp(gait_cmd.phase_velocity_rad_s[i], -phase_rate_limit_rad_s_, phase_rate_limit_rad_s_);
+    }
+    enforce_phase_rate_constraints(
+      base[static_cast<std::size_t>(k)],
+      nominal_vx_sequence_[static_cast<std::size_t>(k)],
+      nominal_wz_sequence_[static_cast<std::size_t>(k)]);
+    for (std::size_t i = 0; i < 6; ++i) {
       phases[i] = PhaseGaitGenerator::wrap_2pi(phases[i] + base[static_cast<std::size_t>(k)][i] * horizon_dt_s_);
     }
   }
@@ -499,10 +550,21 @@ ControllerResult KlannControllerCore::compute(
 
   double desired_heading = body_state.yaw_rad;
   const double path_err = nearest_path_error(plan, body_state.pose.position.x, body_state.pose.position.y, desired_heading);
+  const double goal_dist = final_goal_distance(plan, body_state.pose.position.x, body_state.pose.position.y);
+  if (goal_tolerance_m_ > 0.0 && goal_dist <= goal_tolerance_m_) {
+    std::fill(nominal_vx_sequence_.begin(), nominal_vx_sequence_.end(), 0.0);
+    std::fill(nominal_wz_sequence_.begin(), nominal_wz_sequence_.end(), 0.0);
+    for (auto & step : nominal_phase_rate_sequence_) {
+      step.fill(0.0);
+    }
+    return idle_result(body_state, motor_ids);
+  }
+
+  const double slowdown = clamp(goal_dist / 0.45, 0.25, 1.0);
   const double nominal_vx = clamp(
-    (plan.poses.empty() ? 0.0 : linear_speed_limit_mps_ * std::exp(-2.0 * path_err)),
+    (plan.poses.empty() ? 0.0 : linear_speed_limit_mps_ * slowdown * std::exp(-1.5 * path_err)),
     -linear_speed_limit_mps_, linear_speed_limit_mps_);
-  const double nominal_wz = clamp(1.5 * wrap_pi(desired_heading - body_state.yaw_rad), -angular_speed_limit_rps_, angular_speed_limit_rps_);
+  const double nominal_wz = clamp(1.2 * wrap_pi(desired_heading - body_state.yaw_rad), -angular_speed_limit_rps_, angular_speed_limit_rps_);
   warm_start_sequences(nominal_vx, nominal_wz);
 
   uint8_t base_first_gait_mode = 255U;
@@ -513,9 +575,12 @@ ControllerResult KlannControllerCore::compute(
         0.35 * nominal_phase_rate_sequence_[static_cast<std::size_t>(k)][i] +
         0.65 * base_phase_rate_seq[static_cast<std::size_t>(k)][i];
     }
+    enforce_phase_rate_constraints(
+      nominal_phase_rate_sequence_[static_cast<std::size_t>(k)],
+      nominal_vx_sequence_[static_cast<std::size_t>(k)],
+      nominal_wz_sequence_[static_cast<std::size_t>(k)]);
   }
 
-  std::mt19937 rng(42U);
   std::normal_distribution<double> common_noise(0.0, vx_noise_std_);
   std::normal_distribution<double> side_noise(0.0, wz_noise_std_);
   std::normal_distribution<double> leg_noise(0.0, phase_rate_noise_std_);
@@ -532,15 +597,19 @@ ControllerResult KlannControllerCore::compute(
     double corr_turn = 0.0;
     PhaseRateStep corr_leg{};
     for (int k = 0; k < horizon_steps_; ++k) {
-      corr_common = 0.75 * corr_common + common_noise(rng);
-      corr_turn = 0.75 * corr_turn + side_noise(rng);
+      corr_common = 0.75 * corr_common + common_noise(rng_);
+      corr_turn = 0.75 * corr_turn + side_noise(rng_);
       for (std::size_t i = 0; i < 6; ++i) {
-        corr_leg[i] = 0.65 * corr_leg[i] + leg_noise(rng);
+        corr_leg[i] = 0.65 * corr_leg[i] + leg_noise(rng_);
         const double perturb = corr_common + corr_turn * static_cast<double>(side_sign[i]) + corr_leg[i];
         phase_seq[static_cast<std::size_t>(k)][i] = clamp(
           phase_seq[static_cast<std::size_t>(k)][i] + perturb,
           -phase_rate_limit_rad_s_, phase_rate_limit_rad_s_);
       }
+      enforce_phase_rate_constraints(
+        phase_seq[static_cast<std::size_t>(k)],
+        nominal_vx_sequence_[static_cast<std::size_t>(k)],
+        nominal_wz_sequence_[static_cast<std::size_t>(k)]);
     }
     samples.push_back(rollout_sequence(plan, body_state, phase_seq, base_phase_rate_seq, base_first_gait_mode));
     min_cost = std::min(min_cost, samples.back().cost);
@@ -562,6 +631,12 @@ ControllerResult KlannControllerCore::compute(
       for (std::size_t i = 0; i < 6; ++i) {
         updated_phase_seq[static_cast<std::size_t>(k)][i] /= weight_sum;
       }
+    }
+    for (int k = 0; k < horizon_steps_; ++k) {
+      enforce_phase_rate_constraints(
+        updated_phase_seq[static_cast<std::size_t>(k)],
+        nominal_vx_sequence_[static_cast<std::size_t>(k)],
+        nominal_wz_sequence_[static_cast<std::size_t>(k)]);
     }
     nominal_phase_rate_sequence_ = updated_phase_seq;
   }

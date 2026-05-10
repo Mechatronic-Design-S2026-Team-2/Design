@@ -1,59 +1,38 @@
 controller_server:
   ros__parameters:
-    controller_frequency: 20.0
-    use_realtime_priority: true
-    controller_plugins: ["FollowPath"]
-
+    controller_frequency: 10.0
     FollowPath:
       plugin: "hexapod_nav_cpp::Nav2KlannController"
+      motor_ids: [3, 2, 1, 4, 5, 6]
+      linkage_yaml: ""
       horizon_dt_s: 0.05
-      horizon_steps: 18
-      sample_count: 192
-      nominal_phase_rate_rad_s: 2.0
-      linear_speed_limit_mps: 0.25
-      angular_speed_limit_rps: 0.75
-      temperature: 0.6
-      vx_noise_std: 0.04
-      wz_noise_std: 0.16
-      phase_rate_noise_std: 0.8
+      horizon_steps: 14
+      sample_count: 48
+      nominal_phase_rate_rad_s: 0.25
+      phase_rate_limit_rad_s: 0.45
+      linear_speed_limit_mps: 0.03
+      angular_speed_limit_rps: 0.08
+      temperature: 0.35
+      vx_noise_std: 0.005
+      wz_noise_std: 0.02
+      phase_rate_noise_std: 0.02
       path_weight: 8.0
-      heading_weight: 3.0
-      progress_weight: 1.0
-      support_weight: 30.0
-      support_margin_weight: 8.0
-      slip_weight: 4.0
-      phase_sync_weight: 1.5
-      control_smooth_weight: 0.3
-      lateral_velocity_weight: 2.0
-      yaw_rate_tracking_weight: 0.6
-      roll_weight: 2.0
-      pitch_weight: 2.0
-      roll_tracking_weight: 0.75
-      pitch_tracking_weight: 0.75
-      phase_rate_limit_rad_s: 8.0
-      phase_sync_gain: 1.8
-      turn_phase_bias_gain: 0.8
-      minimum_speed_scale: 0.2
-      wave_turn_threshold_rps: 0.35
-      in_place_turn_threshold_rps: 0.10
+      heading_weight: 8.0
+      progress_weight: 0.25
+      lateral_velocity_weight: 8.0
+      yaw_rate_tracking_weight: 1.5
+      support_weight: 50.0
+      support_margin_weight: 12.0
+      slip_weight: 6.0
+      phase_sync_weight: 20.0
+      control_smooth_weight: 15.0
+      phase_sync_gain: 0.8
+      turn_phase_bias_gain: 0.35
       forward_phase_rate_sign: -1.0
       mirror_kinematics_across_y_axis: true
-      motor_ids: [3, 2, 1, 4, 5, 6]  # [right_front, right_middle, right_back, left_front, left_middle, left_back]
-      body_bbox_min_x_m: -0.32779819
-      body_bbox_max_x_m: 0.42910181
-      body_bbox_min_y_m: -0.54833701
-      body_bbox_max_y_m: 0.55006299
-
-local_costmap:
-  local_costmap:
-    ros__parameters:
-      global_frame: odom
-      robot_base_frame: base_link
-      footprint: "[[0.42910181, 0.55006299], [0.42910181, -0.54833701], [-0.32779819, -0.54833701], [-0.32779819, 0.55006299]]"
-
-global_costmap:
-  global_costmap:
-    ros__parameters:
-      global_frame: map
-      robot_base_frame: base_link
-      footprint: "[[0.42910181, 0.55006299], [0.42910181, -0.54833701], [-0.32779819, -0.54833701], [-0.32779819, 0.55006299]]"
+      lock_forward_phase_rate_sign: true
+      forward_lock_vx_threshold_mps: 0.005
+      forward_lock_wz_threshold_rps: 0.12
+      min_locked_phase_rate_rad_s: 0.03
+      goal_tolerance_m: 0.06
+      random_seed: 42
